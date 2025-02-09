@@ -1,0 +1,23 @@
+# Sensitive files
+backend/config/service_account.json
+backend/client_secrets.json
+backend/config/*.json
+backend/*.json
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+*.pyc
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+
+# System
+.DS_Store
+Thumbs.db
