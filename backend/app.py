@@ -100,9 +100,18 @@ RETRY_DELAY = 1  # seconds
 BASE_DIR = Path(__file__).resolve().parent
 SERVICE_ACCOUNT_FILE = BASE_DIR / 'config' / 'service_account.json'
 
-# Load credentials and create API client
-credentials = service_account.Credentials.from_service_account_file(
-    SERVICE_ACCOUNT_FILE,
+# Replace the file-based credentials with environment-based
+def get_service_account_info():
+    if 'SERVICE_ACCOUNT_JSON' in environ:
+        return json.loads(environ['SERVICE_ACCOUNT_JSON'])
+    else:
+        # Local development fallback
+        with open('config/service_account.json') as f:
+            return json.load(f)
+
+# Update the credentials initialization
+credentials = service_account.Credentials.from_service_account_info(
+    get_service_account_info(),
     scopes=['https://www.googleapis.com/auth/content']
 )
 
