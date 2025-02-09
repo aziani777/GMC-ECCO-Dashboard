@@ -13,20 +13,22 @@ import time
 import atexit
 from google.auth.transport.requests import Request
 from pathlib import Path
+from os import environ
 
 app = Flask(__name__)
 
-# Enable CORS for port 8000
+# Update CORS to use environment variable for frontend URL
+FRONTEND_URL = environ.get('FRONTEND_URL', 'http://localhost:8000')
 CORS(app, 
      resources={r"/*": {
-         "origins": ["http://localhost:8000"],
+         "origins": [FRONTEND_URL],
          "methods": ["GET", "POST", "OPTIONS"],
          "allow_headers": ["Content-Type", "Authorization"],
      }})
 
 @app.after_request
 def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:8000')
+    response.headers.add('Access-Control-Allow-Origin', FRONTEND_URL)
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     return response
@@ -369,5 +371,5 @@ def serve_static(path):
     return send_from_directory('../frontend', path)
 
 if __name__ == '__main__':
-    app.logger.info("Starting Flask server...")
-    app.run(port=5001, debug=True)
+    port = int(environ.get('PORT', 5001))
+    app.run(host='0.0.0.0', port=port)

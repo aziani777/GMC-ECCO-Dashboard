@@ -1,7 +1,7 @@
 console.log('Script starting...');
 
 // Add API base URL constant and cache object at the top
-const API_BASE_URL = 'http://localhost:5001';
+const API_BASE_URL = process.env.BACKEND_URL || 'http://localhost:5001';
 const marketCardsCache = {
     global: null,
     europe: null,
@@ -697,8 +697,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     rootElement.innerHTML = 'Loading...';
 
-                    // Update to use port 5001
-                    const response = await fetch('http://localhost:5001/api/merchants/europe', {
+                    // Update to use API_BASE_URL instead of hardcoded localhost
+                    const response = await fetch(`${API_BASE_URL}/api/merchants/europe`, {
                         method: 'GET',
                         headers: {
                             'Accept': 'application/json',
@@ -762,9 +762,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 } catch (error) {
                     console.error('Error details:', error);
+                    // Add more user-friendly error handling
                     const rootElement = document.getElementById('root');
                     if (rootElement) {
-                        rootElement.innerHTML = `Error loading merchants data: ${error.message}`;
+                        rootElement.innerHTML = `
+                            <div style="padding: 20px; color: #f44336; text-align: center;">
+                                <h3>Error Loading Data</h3>
+                                <p>${error.message}</p>
+                                <button onclick="location.reload()" style="
+                                    padding: 10px 20px;
+                                    background: #4A148C;
+                                    color: white;
+                                    border: none;
+                                    border-radius: 4px;
+                                    cursor: pointer;
+                                    margin-top: 10px;
+                                ">Retry</button>
+                            </div>
+                        `;
                     }
                 }
             }

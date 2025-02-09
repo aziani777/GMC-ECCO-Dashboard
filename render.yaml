@@ -1,0 +1,27 @@
+services:
+  # Backend API service
+  - type: web
+    name: gmc-ecco-backend
+    runtime: python
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: cd backend && gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.0
+      - key: FRONTEND_URL
+        value: https://gmc-ecco-frontend.onrender.com
+      - key: PORT
+        value: 10000
+    
+  # Frontend static site
+  - type: static
+    name: gmc-ecco-frontend
+    buildCommand: cd frontend && node build.js
+    staticPublishPath: ./frontend/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: BACKEND_URL
+        value: https://gmc-ecco-backend.onrender.com 
