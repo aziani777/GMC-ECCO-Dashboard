@@ -13,8 +13,10 @@ services:
         value: 10000
     
   # Frontend as static site (free tier)
-  - type: static
+  - type: web
     name: gmc-ecco-frontend
+    runtime: static
+    plan: free
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/build
     envVars:
