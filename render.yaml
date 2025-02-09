@@ -14,13 +14,16 @@ services:
         value: 10000
     
   # Frontend React application
-  - type: web
+  - type: static
     name: gmc-ecco-frontend
-    runtime: node
     buildCommand: cd frontend && npm install && npm run build
-    startCommand: cd frontend && npm start
+    staticPublishPath: ./frontend/build
     envVars:
       - key: NODE_VERSION
         value: 18.x
       - key: REACT_APP_BACKEND_URL
-        value: https://gmc-ecco-backend.onrender.com 
+        value: https://gmc-ecco-backend.onrender.com
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html 
