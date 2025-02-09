@@ -13,15 +13,14 @@ services:
       - key: PORT
         value: 10000
     
-  # Frontend static site
-  - type: static
+  # Frontend React application
+  - type: web
     name: gmc-ecco-frontend
-    buildCommand: cd frontend && node build.js
-    staticPublishPath: ./frontend/dist
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
+    runtime: node
+    buildCommand: cd frontend && npm install && npm run build
+    startCommand: cd frontend && npm start
     envVars:
-      - key: BACKEND_URL
+      - key: NODE_VERSION
+        value: 18.x
+      - key: REACT_APP_BACKEND_URL
         value: https://gmc-ecco-backend.onrender.com 
