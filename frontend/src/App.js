@@ -4,6 +4,9 @@ import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import './App.css';
 
+// Use environment variable
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
+
 function App() {
   const [selectedRegion, setSelectedRegion] = useState('global');
   const [isLoading, setIsLoading] = useState(false);
