@@ -370,6 +370,14 @@ def serve_frontend():
 def serve_static(path):
     return send_from_directory('../frontend', path)
 
+# Add this route to check server status
+@app.route('/api/health')
+def health_check():
+    return jsonify({
+        'status': 'ok',
+        'timestamp': time.time()
+    })
+
 if __name__ == '__main__':
     port = int(environ.get('PORT', 5001))
     app.run(host='0.0.0.0', port=port)
