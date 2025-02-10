@@ -27,10 +27,13 @@ const MenuItem = styled(Box)(({ active }) => ({
   }
 }));
 
-const ContentArea = styled(Box)({
-  marginLeft: 250,
-  padding: '24px'
-});
+const ContentArea = styled('main')(({ theme }) => ({
+  flexGrow: 1,
+  padding: theme.spacing(3),
+  marginLeft: 240,
+  backgroundColor: '#f5f8fa',  // Light gray-blue background
+  minHeight: '100vh'
+}));
 
 const LogoContainer = styled(Box)({
   display: 'flex',
@@ -150,15 +153,13 @@ const Dashboard = ({ activeRegion = 'global', onRegionChange }) => {
           </Box>
         ) : merchantData.length > 0 ? (
           <Box sx={{ 
-            display: 'flex',
-            flexWrap: 'wrap',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
             gap: 3,
-            justifyContent: 'flex-start'
+            padding: 2
           }}>
             {merchantData.map((merchant, index) => (
-              <Box key={index} sx={{ width: 'calc(33.33% - 16px)' }}>
-                <MerchantCard merchant={merchant} />
-              </Box>
+              <MerchantCard key={index} merchant={merchant} />
             ))}
           </Box>
         ) : (
