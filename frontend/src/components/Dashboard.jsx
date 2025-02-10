@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import MerchantCard from './MerchantCard';
 
@@ -41,12 +41,29 @@ const LogoContainer = styled(Box)({
   }
 });
 
+const MenuButton = styled(Box)(({ theme, active }) => ({
+  padding: theme.spacing(2),
+  cursor: 'pointer',
+  backgroundColor: active ? 'rgba(255,255,255,0.1)' : 'transparent',
+  color: 'white',
+  borderRadius: theme.shape.borderRadius,
+  marginBottom: theme.spacing(1),
+  '&:hover': {
+    backgroundColor: 'rgba(255,255,255,0.1)'
+  },
+  border: 'none',
+  width: '100%',
+  textAlign: 'left',
+  display: 'flex',
+  alignItems: 'center'
+}));
+
 const Dashboard = ({ merchants, activeRegion = 'global', onRegionChange }) => {
   console.log('Dashboard props:', { merchants, activeRegion, onRegionChange });
 
-  const handleRegionClick = (region) => {
+  const handleClick = (region) => {
     console.log('Clicking region:', region);
-    if (onRegionChange) {
+    if (typeof onRegionChange === 'function') {
       onRegionChange(region);
     }
   };
@@ -71,45 +88,26 @@ const Dashboard = ({ merchants, activeRegion = 'global', onRegionChange }) => {
           Dashboard
         </Typography>
         
-        <Button
-          fullWidth
-          onClick={() => handleRegionClick('global')}
-          sx={{
-            p: 2,
-            justifyContent: 'flex-start',
-            bgcolor: activeRegion === 'global' ? 'rgba(255,255,255,0.1)' : 'transparent',
-            color: 'white',
-            borderRadius: 1,
-            mb: 1,
-            '&:hover': {
-              bgcolor: 'rgba(255,255,255,0.1)'
-            }
-          }}
+        <MenuButton
+          component="button"
+          active={activeRegion === 'global'}
+          onClick={() => handleClick('global')}
         >
           🌐 Global
-        </Button>
+        </MenuButton>
         
-        <Button
-          fullWidth
-          onClick={() => handleRegionClick('europe')}
-          sx={{
-            p: 2,
-            justifyContent: 'flex-start',
-            bgcolor: activeRegion === 'europe' ? 'rgba(255,255,255,0.1)' : 'transparent',
-            color: 'white',
-            borderRadius: 1,
-            '&:hover': {
-              bgcolor: 'rgba(255,255,255,0.1)'
-            }
-          }}
+        <MenuButton
+          component="button"
+          active={activeRegion === 'europe'}
+          onClick={() => handleClick('europe')}
         >
           🌍 Europe
-        </Button>
+        </MenuButton>
       </SideMenu>
 
       <ContentArea>
         <Typography variant="h5" sx={{ mb: 4 }}>
-          ECCO Shoes - {activeRegion.toUpperCase()}
+          ECCO Shoes - {activeRegion?.toUpperCase() || 'GLOBAL'}
         </Typography>
         
         <Box sx={{ 
