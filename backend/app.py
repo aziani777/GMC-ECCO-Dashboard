@@ -96,10 +96,20 @@ SERVICE_ACCOUNT_FILE = BASE_DIR / 'config' / 'service_account.json'
 
 def get_service_account_info():
     """Get service account info from environment variable."""
-    service_account_json = os.getenv('SERVICE_ACCOUNT_JSON')
-    if not service_account_json:
-        raise Exception("SERVICE_ACCOUNT_JSON environment variable is required")
-    return json.loads(service_account_json)
+    try:
+        service_account_json = os.getenv('SERVICE_ACCOUNT_JSON')
+        if not service_account_json:
+            raise Exception("SERVICE_ACCOUNT_JSON environment variable is not set")
+        
+        # Try to parse the JSON
+        try:
+            return json.loads(service_account_json)
+        except json.JSONDecodeError:
+            raise Exception("SERVICE_ACCOUNT_JSON is not valid JSON")
+            
+    except Exception as e:
+        print(f"Error getting service account info: {str(e)}")
+        raise
 
 def initialize_service():
     """Initialize and return the Google Sheets service."""
@@ -272,9 +282,8 @@ def fetch_merchant_data(merchant_id, account_id):
 def get_merchants(region):
     try:
         service = initialize_service()
-        # Your existing spreadsheet logic here
         spreadsheet_id = '1FGY9UqPwTvzwrGqtWDAzqEr1G0Rj2RMQO6mLxZwOWrk'
-        range_name = f'{region}!A2:Z'  # Adjust range as needed
+        range_name = f'{region}!A2:Z'
         
         result = service.spreadsheets().values().get(
             spreadsheetId=spreadsheet_id,
@@ -285,8 +294,7 @@ def get_merchants(region):
         if not values:
             return jsonify({"error": "No data found"}), 404
             
-        # Process your data here
-        # For now, returning dummy data
+        # Return the data in the expected format
         return jsonify({
             f"ECCO {region.upper()}": {
                 "name": f"ECCO {region.upper()}",
