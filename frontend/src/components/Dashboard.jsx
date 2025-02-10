@@ -49,6 +49,17 @@ const Dashboard = ({ data, activeRegion, setActiveRegion }) => {
   const regionKey = `ECCO ${activeRegion?.toUpperCase()}`;
   const merchants = data?.[regionKey]?.data || [];
 
+  // Define explicit handler functions
+  const handleGlobalClick = () => {
+    console.log('Clicking Global');
+    setActiveRegion('global');
+  };
+
+  const handleEuropeClick = () => {
+    console.log('Clicking Europe');
+    setActiveRegion('europe');
+  };
+
   return (
     <Box sx={{ display: 'flex' }}>
       <SideMenu>
@@ -62,13 +73,19 @@ const Dashboard = ({ data, activeRegion, setActiveRegion }) => {
         </Typography>
         
         <Box 
-          onClick={() => setActiveRegion('global')}
+          component="button"  // Make it a button element
+          onClick={handleGlobalClick}  // Use the explicit handler
           sx={{
             p: 2,
+            width: '100%',
             cursor: 'pointer',
             bgcolor: activeRegion === 'global' ? 'rgba(255,255,255,0.1)' : 'transparent',
+            border: 'none',  // Remove button border
+            color: 'white',  // Text color
             borderRadius: 1,
             mb: 1,
+            display: 'flex',
+            alignItems: 'center',
             '&:hover': {
               bgcolor: 'rgba(255,255,255,0.1)'
             }
@@ -78,12 +95,18 @@ const Dashboard = ({ data, activeRegion, setActiveRegion }) => {
         </Box>
         
         <Box 
-          onClick={() => setActiveRegion('europe')}
+          component="button"  // Make it a button element
+          onClick={handleEuropeClick}  // Use the explicit handler
           sx={{
             p: 2,
+            width: '100%',
             cursor: 'pointer',
             bgcolor: activeRegion === 'europe' ? 'rgba(255,255,255,0.1)' : 'transparent',
+            border: 'none',  // Remove button border
+            color: 'white',  // Text color
             borderRadius: 1,
+            display: 'flex',
+            alignItems: 'center',
             '&:hover': {
               bgcolor: 'rgba(255,255,255,0.1)'
             }
