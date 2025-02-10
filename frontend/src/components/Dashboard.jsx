@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import MerchantCard from './MerchantCard';
 
@@ -64,13 +64,14 @@ const Dashboard = ({ merchants, activeRegion = 'global', setActiveRegion }) => {
           Dashboard
         </Typography>
         
-        <div 
-          role="button"
+        <Button
+          fullWidth
           onClick={() => setActiveRegion('global')}
-          style={{ cursor: 'pointer' }}
           sx={{
             p: 2,
+            justifyContent: 'flex-start',
             bgcolor: activeRegion === 'global' ? 'rgba(255,255,255,0.1)' : 'transparent',
+            color: 'white',
             borderRadius: 1,
             mb: 1,
             '&:hover': {
@@ -78,24 +79,25 @@ const Dashboard = ({ merchants, activeRegion = 'global', setActiveRegion }) => {
             }
           }}
         >
-          <Typography sx={{ color: 'white' }}>🌐 Global</Typography>
-        </div>
+          🌐 Global
+        </Button>
         
-        <div 
-          role="button"
+        <Button
+          fullWidth
           onClick={() => setActiveRegion('europe')}
-          style={{ cursor: 'pointer' }}
           sx={{
             p: 2,
+            justifyContent: 'flex-start',
             bgcolor: activeRegion === 'europe' ? 'rgba(255,255,255,0.1)' : 'transparent',
+            color: 'white',
             borderRadius: 1,
             '&:hover': {
               bgcolor: 'rgba(255,255,255,0.1)'
             }
           }}
         >
-          <Typography sx={{ color: 'white' }}>🌍 Europe</Typography>
-        </div>
+          🌍 Europe
+        </Button>
       </SideMenu>
 
       <ContentArea>
