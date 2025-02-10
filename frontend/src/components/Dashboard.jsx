@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import MerchantCard from './MerchantCard';
 
@@ -65,6 +65,8 @@ const Dashboard = ({ merchants, activeRegion = 'global', onRegionChange }) => {
     console.log('Clicking region:', region);
     if (typeof onRegionChange === 'function') {
       onRegionChange(region);
+    } else {
+      console.warn('onRegionChange is not a function:', onRegionChange);
     }
   };
 
@@ -88,21 +90,38 @@ const Dashboard = ({ merchants, activeRegion = 'global', onRegionChange }) => {
           Dashboard
         </Typography>
         
-        <MenuButton
-          component="button"
-          active={activeRegion === 'global'}
+        <Button
+          fullWidth
+          variant="text"
           onClick={() => handleClick('global')}
+          sx={{
+            justifyContent: 'flex-start',
+            color: 'white',
+            backgroundColor: activeRegion === 'global' ? 'rgba(255,255,255,0.1)' : 'transparent',
+            '&:hover': {
+              backgroundColor: 'rgba(255,255,255,0.2)'
+            },
+            mb: 1
+          }}
         >
           🌐 Global
-        </MenuButton>
+        </Button>
         
-        <MenuButton
-          component="button"
-          active={activeRegion === 'europe'}
+        <Button
+          fullWidth
+          variant="text"
           onClick={() => handleClick('europe')}
+          sx={{
+            justifyContent: 'flex-start',
+            color: 'white',
+            backgroundColor: activeRegion === 'europe' ? 'rgba(255,255,255,0.1)' : 'transparent',
+            '&:hover': {
+              backgroundColor: 'rgba(255,255,255,0.2)'
+            }
+          }}
         >
           🌍 Europe
-        </MenuButton>
+        </Button>
       </SideMenu>
 
       <ContentArea>
