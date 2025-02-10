@@ -8,10 +8,33 @@ import {
   List,
   ListItem,
   ListItemText,
-  Divider
+  Divider,
+  CardContent
 } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { styled } from '@mui/material/styles';
+
+const StyledCard = styled(Card)(({ theme }) => ({
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  backgroundColor: theme.palette.background.paper,
+  '&:hover': {
+    boxShadow: theme.shadows[4],
+    transform: 'translateY(-2px)',
+    transition: 'all 0.3s ease-in-out'
+  }
+}));
+
+const StatBox = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  padding: theme.spacing(1),
+  backgroundColor: theme.palette.background.default,
+  borderRadius: theme.shape.borderRadius,
+  marginTop: theme.spacing(1)
+}));
 
 const MerchantCard = ({ merchant }) => {
   const [showIssues, setShowIssues] = useState(false);
@@ -27,51 +50,37 @@ const MerchantCard = ({ merchant }) => {
   )?.itemLevelIssues || [];
 
   return (
-    <Card sx={{
-      width: 300,
-      height: 'fit-content',
-      backgroundColor: '#f5f9ff',
-      borderRadius: 2,
-      boxShadow: 3,
-      overflow: 'visible'
-    }}>
-      <Box sx={{ p: 3 }}>
-        <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
+    <StyledCard>
+      <CardContent>
+        <Typography variant="h6" gutterBottom>
           {merchant.name}
         </Typography>
+        
+        <Typography color="textSecondary" gutterBottom>
+          ID: {merchant.country}
+        </Typography>
+        
+        <Typography 
+          color={merchant.status === 'Active' ? 'success.main' : 'error.main'} 
+          gutterBottom
+        >
+          Status: {merchant.status}
+        </Typography>
 
-        <Box sx={{ 
-          display: 'grid', 
-          gridTemplateColumns: '1fr 1fr', 
-          gap: 2,
-          mb: 2
-        }}>
-          <Box sx={{ 
-            p: 2, 
-            bgcolor: '#fff', 
-            borderRadius: 1,
-            textAlign: 'center',
-            boxShadow: 1
-          }}>
-            <Typography variant="h4" color="success.main">
-              {shoppingStats.active || 0}
-            </Typography>
-            <Typography color="text.secondary">Approved</Typography>
+        <StatBox>
+          <Box>
+            <Typography variant="body2" color="textSecondary">Active</Typography>
+            <Typography variant="h6" color="success.main">{merchant.active}</Typography>
           </Box>
-          
-          <Box sx={{ 
-            p: 2, 
-            bgcolor: '#fff', 
-            borderRadius: 1,
-            textAlign: 'center',
-            boxShadow: 1
-          }}>
-            <Typography variant="h4" color="error.main">
-              {shoppingStats.disapproved || 0}
-            </Typography>
-            <Typography color="text.secondary">Disapproved</Typography>
+          <Box>
+            <Typography variant="body2" color="textSecondary">Disapproved</Typography>
+            <Typography variant="h6" color="error.main">{merchant.disapproved}</Typography>
           </Box>
-        </Box>
+          <Box>
+            <Typography variant="body2" color="textSecondary">Total</Typography>
+            <Typography variant="h6">{merchant.total}</Typography>
+          </Box>
+        </StatBox>
 
         {(accountIssues.length > 0 || itemIssues.length > 0) && (
           <>
@@ -136,8 +145,8 @@ const MerchantCard = ({ merchant }) => {
             </Collapse>
           </>
         )}
-      </Box>
-    </Card>
+      </CardContent>
+    </StyledCard>
   );
 };
 
