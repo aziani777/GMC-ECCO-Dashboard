@@ -214,7 +214,7 @@ const Dashboard = () => {
               width: 'auto',
               height: '40px',
               marginRight: '10px',
-              filter: 'brightness(0) invert(1)'  // This will make it white on dark background
+              filter: 'transparent(10) invert(1)'
             }} 
           />
         </LogoContainer>
