@@ -30,19 +30,19 @@ def after_request(response):
 # Define merchant configurations
 app.config['GLOBAL_MERCHANTS'] = [
     {
-        'account_id': '6000402',    # US account (non-MCA)
-        'name': 'ECCO US',    # Official Merchant Center name
-        'path': 'merchants/6000402/products'  # Path for US products
+        'merchant_id': '6000402',    # US account
+        'account_id': '6000402',     # Same as merchant_id for global
+        'name': 'ECCO US'
     },
     {
-        'account_id': '126580264',   # CA account
-        'name': 'ECCO CA',    # Official Merchant Center name
-        'path': 'merchants/126580264/products'  # Path for CA products
+        'merchant_id': '126580264',   # CA account
+        'account_id': '126580264',    # Same as merchant_id for global
+        'name': 'ECCO CA'
     },
     {
-        'account_id': '124463984',   # AU account
-        'name': 'ECCO AU',    # Official Merchant Center name
-        'path': 'merchants/124463984/products'  # Path for AU products
+        'merchant_id': '124463984',   # AU account
+        'account_id': '124463984',    # Same as merchant_id for global
+        'name': 'ECCO AU'
     }
 ]
 
@@ -292,18 +292,48 @@ def initialize_content_api():
         raise
 
 def get_merchant_status(service, merchant):
-    """Get status for a single merchant"""
+    """Get detailed status for a single merchant"""
     try:
-        status = service.accounts().get(
-            merchantId=merchant['account_id'],
-            accountId=merchant.get('merchantId', merchant['account_id'])
+        # Get account status
+        account_status = service.accountstatuses().get(
+            merchantId=merchant['merchant_id'],
+            accountId=merchant['account_id']
         ).execute()
         
+        # Get product status statistics
+        products_status = service.productstatuses().list(
+            merchantId=merchant['merchant_id'],
+            maxResults=250  # Adjust as needed
+        ).execute()
+        
+        # Count products by status
+        products = products_status.get('resources', [])
+        approved_count = sum(1 for p in products if p.get('itemLevelIssues') is None)
+        disapproved_count = sum(1 for p in products if p.get('itemLevelIssues') is not None)
+        
+        # Collect all unique item-level issues
+        item_level_issues = {}
+        for product in products:
+            issues = product.get('itemLevelIssues', [])
+            for issue in issues:
+                issue_id = issue.get('id')
+                if issue_id:
+                    item_level_issues[issue_id] = item_level_issues.get(issue_id, 0) + 1
+
         return {
             'name': merchant['name'],
             'accountId': merchant['account_id'],
-            'status': status.get('accountStatus'),
-            'issues': status.get('issues', [])
+            'status': account_status.get('accountStatus'),
+            'accountLevelIssues': account_status.get('issues', []),
+            'products': {
+                'total': len(products),
+                'approved': approved_count,
+                'disapproved': disapproved_count,
+            },
+            'itemLevelIssues': [
+                {'id': issue_id, 'count': count}
+                for issue_id, count in item_level_issues.items()
+            ]
         }
     except Exception as e:
         app.logger.error(f"Error getting status for {merchant['name']}: {str(e)}")
@@ -317,22 +347,24 @@ def get_merchant_status(service, merchant):
 def get_merchants(region):
     try:
         service = initialize_content_api()
-        merchants = app.config['GLOBAL_MERCHANTS'] if region == 'global' else app.config['EUROPE_MERCHANTS']
         
-        app.logger.info(f"Fetching data for region: {region}")
-        
-        # Get status for all merchants in parallel
-        merchant_data = []
-        for merchant in merchants:
-            status = get_merchant_status(service, merchant)
-            merchant_data.append(status)
-        
-        return jsonify({
-            f"ECCO {region.upper()}": {
-                "name": f"ECCO {region.upper()}",
-                "data": merchant_data
-            }
-        })
+        if region == 'global':
+            merchants = app.config['GLOBAL_MERCHANTS']
+            merchant_data = []
+            for merchant in merchants:
+                status = get_merchant_status(service, merchant)
+                merchant_data.append(status)
+            
+            return jsonify({
+                "ECCO GLOBAL": {
+                    "name": "ECCO GLOBAL",
+                    "data": merchant_data
+                }
+            })
+        else:
+            # Handle Europe region later
+            return jsonify({"error": "Region not implemented"}), 501
+            
     except Exception as e:
         app.logger.error(f"Server error in get_merchants: {str(e)}")
         return jsonify({"error": f"Server error: {str(e)}"}), 500
