@@ -17,18 +17,12 @@ from os import environ
 
 app = Flask(__name__)
 
-# Update CORS to use environment variable for frontend URL
-FRONTEND_URL = environ.get('FRONTEND_URL', 'http://localhost:8000')
-CORS(app, 
-     resources={r"/*": {
-         "origins": [FRONTEND_URL],
-         "methods": ["GET", "POST", "OPTIONS"],
-         "allow_headers": ["Content-Type", "Authorization"],
-     }})
+# Enable CORS for all domains
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 @app.after_request
 def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', FRONTEND_URL)
+    response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     return response
@@ -294,13 +288,13 @@ def fetch_merchant_data(merchant_id, account_id):
                 raise
             time.sleep(RETRY_DELAY)
 
-@app.route('/api/merchants/global')
-def get_global_merchants():
+@app.route('/api/merchants/<region>')
+def get_merchants(region):
     try:
-        app.logger.info("Fetching global merchants data")
+        app.logger.info(f"Fetching {region} merchants data")
         results = {}
         
-        for merchant in app.config['GLOBAL_MERCHANTS']:
+        for merchant in get_merchant_accounts(region):
             try:
                 results[merchant['name']] = fetch_merchant_data(
                     merchant['account_id'],
@@ -310,11 +304,10 @@ def get_global_merchants():
                 app.logger.error(f"Error fetching {merchant['name']}: {str(e)}")
                 results[merchant['name']] = {'error': str(e)}
         
-        return jsonify(results)
-            
+        return jsonify(results), 200
     except Exception as e:
-        app.logger.error(f"Global merchants error: {str(e)}")
-        return jsonify({'error': str(e)}), 500
+        app.logger.error(f"Error getting {region} merchants: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/merchants/europe')
 def get_merchant_status():
@@ -376,13 +369,10 @@ def serve_frontend():
 def serve_static(path):
     return send_from_directory('../frontend', path)
 
-# Add this route to check server status
-@app.route('/api/health')
+# Add a health check endpoint
+@app.route('/health')
 def health_check():
-    return jsonify({
-        'status': 'ok',
-        'timestamp': time.time()
-    })
+    return jsonify({"status": "healthy"}), 200
 
 if __name__ == '__main__':
     port = int(environ.get('PORT', 5001))
