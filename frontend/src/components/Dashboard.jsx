@@ -209,8 +209,13 @@ const Dashboard = () => {
           />
           <img 
             src="/gmc.png" 
-            alt="GMC" 
-            style={{ height: '24px', filter: 'brightness(0) invert(1)' }} 
+            alt="GMC Logo" 
+            style={{ 
+              width: 'auto',
+              height: '40px',
+              marginRight: '10px',
+              filter: 'brightness(0) invert(1)'  // This will make it white on dark background
+            }} 
           />
         </LogoContainer>
         
