@@ -282,28 +282,37 @@ def fetch_merchant_data(merchant_id, account_id):
 def get_merchants(region):
     try:
         service = initialize_service()
-        spreadsheet_id = '1FGY9UqPwTvzwrGqtWDAzqEr1G0Rj2RMQO6mLxZwOWrk'
+        spreadsheet_id = os.getenv('GOOGLE_SHEETS_ID', '1FGY9UqPwTvzwrGqtWDAzqEr1G0Rj2RMQO6mLxZwOWrk')
         range_name = f'{region}!A2:Z'
         
-        result = service.spreadsheets().values().get(
-            spreadsheetId=spreadsheet_id,
-            range=range_name
-        ).execute()
+        # Add debug logging
+        app.logger.info(f"Fetching data for region: {region}")
+        app.logger.info(f"Using spreadsheet ID: {spreadsheet_id}")
         
-        values = result.get('values', [])
-        if not values:
-            return jsonify({"error": "No data found"}), 404
+        try:
+            result = service.spreadsheets().values().get(
+                spreadsheetId=spreadsheet_id,
+                range=range_name
+            ).execute()
             
-        # Return the data in the expected format
-        return jsonify({
-            f"ECCO {region.upper()}": {
-                "name": f"ECCO {region.upper()}",
-                "data": values
-            }
-        })
+            values = result.get('values', [])
+            if not values:
+                app.logger.warning("No data found in spreadsheet")
+                return jsonify({"error": "No data found"}), 404
+                
+            return jsonify({
+                f"ECCO {region.upper()}": {
+                    "name": f"ECCO {region.upper()}",
+                    "data": values
+                }
+            })
+        except Exception as e:
+            app.logger.error(f"Google Sheets API error: {str(e)}")
+            return jsonify({"error": f"Google Sheets API error: {str(e)}"}), 500
+            
     except Exception as e:
-        print(f"Error in get_merchants: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        app.logger.error(f"Server error in get_merchants: {str(e)}")
+        return jsonify({"error": f"Server error: {str(e)}"}), 500
 
 @app.route('/api/merchants/europe')
 def get_merchant_status():
