@@ -65,10 +65,31 @@ const MenuButton = styled(Box)(({ theme, active }) => ({
 }));
 
 const Dashboard = () => {
-  const [merchantData, setMerchantData] = useState([]);
+  const [merchantData, setMerchantData] = useState({
+    global: [],
+    europe: []
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [selectedRegion, setSelectedRegion] = useState('global');
   const [lastUpdate, setLastUpdate] = useState(null);
+
+  const isGlobalMarket = (merchantName) => {
+    return merchantName.includes('US') || 
+           merchantName.includes('CA') || 
+           merchantName.includes('AU');
+  };
+
+  const isEuropeanMarket = (merchantName) => {
+    return merchantName.includes('GB') || 
+           merchantName.includes('FR') || 
+           merchantName.includes('DE');
+  };
+
+  const filterMerchantsByRegion = (merchants, region) => {
+    return merchants.filter(merchant => 
+      region === 'global' ? isGlobalMarket(merchant.name) : isEuropeanMarket(merchant.name)
+    );
+  };
 
   const fetchData = async (region, force = false) => {
     // Check if we already have data for this region
@@ -78,42 +99,83 @@ const Dashboard = () => {
 
     // Use cache if available and not forced refresh
     if (!force && cachedData && cacheTimestamp) {
-      const cacheAge = now - parseInt(cacheTimestamp);
-      const cacheExpiry = new Date().setHours(3, 0, 0, 0); // 3 AM CET
+      const cache = JSON.parse(cachedData);
+      const timestamp = parseInt(cacheTimestamp);
       
-      if (cacheAge < 24 * 60 * 60 * 1000 && now < cacheExpiry) {
-        setMerchantData(JSON.parse(cachedData));
-        setLastUpdate(new Date(parseInt(cacheTimestamp)));
-        return;
-      }
+      setMerchantData(prevData => ({
+        ...prevData,
+        [region]: cache
+      }));
+      setLastUpdate(new Date(timestamp));
+      return;
     }
 
     // Only fetch if forced or no cache
-    if (force || !cachedData) {
-      setIsLoading(true);
-      try {
-        const merchants = await updateMerchantDisplay(region);
-        setMerchantData(merchants);
-        
-        // Update cache
-        localStorage.setItem(`merchantData_${region}`, JSON.stringify(merchants));
-        localStorage.setItem(`merchantDataTimestamp_${region}`, now.toString());
-        setLastUpdate(new Date(now));
-      } catch (error) {
-        console.error('Error:', error);
-      } finally {
-        setIsLoading(false);
-      }
+    setIsLoading(true);
+    try {
+      const allMerchants = await updateMerchantDisplay(region);
+      const filteredMerchants = filterMerchantsByRegion(allMerchants, region);
+      
+      setMerchantData(prevData => ({
+        ...prevData,
+        [region]: filteredMerchants
+      }));
+      
+      // Update cache
+      localStorage.setItem(`merchantData_${region}`, JSON.stringify(filteredMerchants));
+      localStorage.setItem(`merchantDataTimestamp_${region}`, now.toString());
+      setLastUpdate(new Date(now));
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleRegionChange = (region) => {
     setSelectedRegion(region);
-    fetchData(region, false); // Don't force refresh on region change
+    // Only fetch if we don't have data for this region
+    if (!merchantData[region] || merchantData[region].length === 0) {
+      fetchData(region, false);
+    }
   };
 
+  // Schedule daily refresh at 3 AM CET
   useEffect(() => {
-    fetchData(selectedRegion, false);
+    const scheduleDailyRefresh = () => {
+      const now = new Date();
+      const cetTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Paris' }));
+      
+      // Set next refresh time to 3 AM CET
+      const nextRefresh = new Date(cetTime);
+      nextRefresh.setHours(3, 0, 0, 0);
+      
+      // If it's past 3 AM, schedule for next day
+      if (cetTime.getHours() >= 3) {
+        nextRefresh.setDate(nextRefresh.getDate() + 1);
+      }
+      
+      const timeUntilRefresh = nextRefresh - cetTime;
+      
+      // Schedule the refresh
+      const refreshTimeout = setTimeout(() => {
+        fetchData('global', true);
+        fetchData('europe', true);
+        // Reschedule for next day
+        scheduleDailyRefresh();
+      }, timeUntilRefresh);
+
+      return () => clearTimeout(refreshTimeout);
+    };
+
+    scheduleDailyRefresh();
+  }, []);
+
+  // Initial fetch
+  useEffect(() => {
+    if (!merchantData[selectedRegion] || merchantData[selectedRegion].length === 0) {
+      fetchData(selectedRegion, false);
+    }
   }, []);
 
   return (
@@ -189,11 +251,10 @@ const Dashboard = () => {
         </Box>
         
         {isLoading ? (
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '200px' }}>
-            <CircularProgress sx={{ mb: 2 }} />
-            <Typography>Loading data. Please wait...</Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+            <CircularProgress />
           </Box>
-        ) : merchantData.length > 0 ? (
+        ) : (
           <Box sx={{ 
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
@@ -201,12 +262,10 @@ const Dashboard = () => {
             padding: '0 2px',
             width: '100%'
           }}>
-            {merchantData.map((merchant, index) => (
-              <MerchantCard key={index} merchant={merchant} />
+            {merchantData[selectedRegion]?.map((merchant, index) => (
+              <MerchantCard key={merchant.name} merchant={merchant} />
             ))}
           </Box>
-        ) : (
-          <Typography>No merchant data available for this region.</Typography>
         )}
       </ContentArea>
     </Box>
