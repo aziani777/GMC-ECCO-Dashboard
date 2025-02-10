@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import MerchantCard from './MerchantCard';
+import { updateMerchantDisplay } from '../script';  // Import the new function
 
 const SideMenu = styled(Box)(({ theme }) => ({
   width: 250,
@@ -58,17 +59,23 @@ const MenuButton = styled(Box)(({ theme, active }) => ({
   alignItems: 'center'
 }));
 
-const Dashboard = ({ merchants, activeRegion = 'global', onRegionChange }) => {
-  console.log('Dashboard props:', { merchants, activeRegion, onRegionChange });
+const Dashboard = ({ activeRegion = 'global', onRegionChange }) => {
+  const [merchantData, setMerchantData] = useState([]);
 
-  const handleClick = (region) => {
+  const handleClick = async (region) => {
     console.log('Clicking region:', region);
     if (typeof onRegionChange === 'function') {
       onRegionChange(region);
-    } else {
-      console.warn('onRegionChange is not a function:', onRegionChange);
     }
+    // Fetch and update merchant data
+    const merchants = await updateMerchantDisplay(region);
+    setMerchantData(merchants);
   };
+
+  // Initial data fetch
+  useEffect(() => {
+    handleClick(activeRegion);
+  }, [activeRegion]);
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -134,7 +141,7 @@ const Dashboard = ({ merchants, activeRegion = 'global', onRegionChange }) => {
           gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
           gap: 3 
         }}>
-          {(merchants?.data || []).map((merchant, index) => (
+          {merchantData.map((merchant, index) => (
             <MerchantCard key={index} merchant={merchant} />
           ))}
         </Box>
