@@ -20,17 +20,28 @@ function App() {
     const fetchMerchants = async () => {
       setLoading(true);
       try {
+        console.log('Fetching data for region:', activeRegion);
         const response = await fetch(`https://gmc-ecco-backend.onrender.com/api/merchants/${activeRegion}`);
         const data = await response.json();
-        setMerchants(data[`ECCO ${activeRegion.toUpperCase()}`]);
+        console.log('Received data:', data);
+        
+        // Check which key to use based on region
+        const key = `ECCO ${activeRegion.toUpperCase()}`;
+        setMerchants(data[key]);
       } catch (error) {
         console.error('Error fetching merchants:', error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchMerchants();
   }, [activeRegion]);
+
+  const handleRegionChange = (newRegion) => {
+    console.log('Changing region to:', newRegion);
+    setActiveRegion(newRegion);
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -42,7 +53,7 @@ function App() {
         <Dashboard 
           merchants={merchants} 
           activeRegion={activeRegion}
-          setActiveRegion={setActiveRegion}
+          setActiveRegion={handleRegionChange}
         />
       )}
     </ThemeProvider>

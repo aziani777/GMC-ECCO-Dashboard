@@ -43,11 +43,15 @@ const LogoContainer = styled(Box)({
 });
 
 const Dashboard = ({ merchants, activeRegion, setActiveRegion }) => {
+  console.log('Dashboard rendered with:', { merchants, activeRegion });
+  
   const handleGlobalClick = () => {
+    console.log('Global clicked');
     setActiveRegion('global');
   };
 
   const handleEuropeClick = () => {
+    console.log('Europe clicked');
     setActiveRegion('europe');
   };
 
@@ -63,24 +67,41 @@ const Dashboard = ({ merchants, activeRegion, setActiveRegion }) => {
           Dashboard
         </Typography>
         
-        <MenuItem 
-          active={activeRegion === 'global'} 
+        <Box 
           onClick={handleGlobalClick}
+          sx={{
+            p: 2,
+            cursor: 'pointer',
+            bgcolor: activeRegion === 'global' ? 'rgba(255,255,255,0.1)' : 'transparent',
+            borderRadius: 1,
+            mb: 1,
+            '&:hover': {
+              bgcolor: 'rgba(255,255,255,0.1)'
+            }
+          }}
         >
           <Typography>🌐 Global</Typography>
-        </MenuItem>
+        </Box>
         
-        <MenuItem 
-          active={activeRegion === 'europe'} 
+        <Box 
           onClick={handleEuropeClick}
+          sx={{
+            p: 2,
+            cursor: 'pointer',
+            bgcolor: activeRegion === 'europe' ? 'rgba(255,255,255,0.1)' : 'transparent',
+            borderRadius: 1,
+            '&:hover': {
+              bgcolor: 'rgba(255,255,255,0.1)'
+            }
+          }}
         >
           <Typography>🌍 Europe</Typography>
-        </MenuItem>
+        </Box>
       </SideMenu>
 
       <ContentArea>
         <Typography variant="h5" sx={{ mb: 4 }}>
-          ECCO Shoes
+          ECCO Shoes - {activeRegion.toUpperCase()}
         </Typography>
         
         <Box sx={{ 
