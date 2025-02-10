@@ -1,108 +1,141 @@
 import React, { useState } from 'react';
-import {
-  Card,
-  CardContent,
-  Typography,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Chip,
-  Box,
-  Divider,
-  Collapse,
-  IconButton
+import { 
+  Card, 
+  Typography, 
+  Box, 
+  Collapse, 
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Divider
 } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ErrorIcon from '@mui/icons-material/Error';
-import WarningIcon from '@mui/icons-material/Warning';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import '../styles/MerchantCard.css';
 
 const MerchantCard = ({ merchant }) => {
-  const [expanded, setExpanded] = useState(false);
   const [showIssues, setShowIssues] = useState(false);
   
-  // Extract statistics from merchant data
-  const stats = merchant?.data?.products?.[0]?.statistics || {};
+  // Get Shopping destination statistics
+  const shoppingStats = merchant?.data?.products?.find(
+    p => p.destination === 'Shopping' && p.channel === 'online'
+  )?.statistics || {};
+
   const accountIssues = merchant?.data?.accountLevelIssues || [];
-  const itemIssues = merchant?.data?.products?.[0]?.itemLevelIssues || [];
+  const itemIssues = merchant?.data?.products?.find(
+    p => p.destination === 'Shopping'
+  )?.itemLevelIssues || [];
 
   return (
-    <Card className="merchant-card" sx={{
+    <Card sx={{
       width: 300,
       height: 'fit-content',
-      m: 2,
-      p: 3,
       backgroundColor: '#f5f9ff',
       borderRadius: 2,
-      boxShadow: 3
+      boxShadow: 3,
+      overflow: 'visible'
     }}>
-      <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
-        {merchant.name}
-      </Typography>
+      <Box sx={{ p: 3 }}>
+        <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
+          {merchant.name}
+        </Typography>
 
-      <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
         <Box sx={{ 
-          p: 2, 
-          bgcolor: '#fff', 
-          borderRadius: 1,
-          textAlign: 'center'
+          display: 'grid', 
+          gridTemplateColumns: '1fr 1fr', 
+          gap: 2,
+          mb: 2
         }}>
-          <Typography variant="h4" color="success.main">
-            {stats.active || 0}
-          </Typography>
-          <Typography>Approved</Typography>
+          <Box sx={{ 
+            p: 2, 
+            bgcolor: '#fff', 
+            borderRadius: 1,
+            textAlign: 'center',
+            boxShadow: 1
+          }}>
+            <Typography variant="h4" color="success.main">
+              {shoppingStats.active || 0}
+            </Typography>
+            <Typography color="text.secondary">Approved</Typography>
+          </Box>
+          
+          <Box sx={{ 
+            p: 2, 
+            bgcolor: '#fff', 
+            borderRadius: 1,
+            textAlign: 'center',
+            boxShadow: 1
+          }}>
+            <Typography variant="h4" color="error.main">
+              {shoppingStats.disapproved || 0}
+            </Typography>
+            <Typography color="text.secondary">Disapproved</Typography>
+          </Box>
         </Box>
-        
-        <Box sx={{ 
-          p: 2, 
-          bgcolor: '#fff', 
-          borderRadius: 1,
-          textAlign: 'center'
-        }}>
-          <Typography variant="h4" color="error.main">
-            {stats.disapproved || 0}
-          </Typography>
-          <Typography>Disapproved</Typography>
-        </Box>
-      </Box>
 
-      <Box sx={{ mt: 2 }}>
-        <IconButton 
-          onClick={() => setShowIssues(!showIssues)}
-          sx={{ width: '100%' }}
-        >
-          {showIssues ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-        </IconButton>
-        
-        <Collapse in={showIssues}>
-          {accountIssues.length > 0 && (
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                Account Issues
+        {(accountIssues.length > 0 || itemIssues.length > 0) && (
+          <>
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'space-between'
+            }}>
+              <Typography variant="subtitle2" color="text.secondary">
+                View Issues
               </Typography>
-              {accountIssues.map((issue, index) => (
-                <Typography key={index} color="error" variant="body2">
-                  • {issue.title}
-                </Typography>
-              ))}
+              <IconButton 
+                onClick={() => setShowIssues(!showIssues)}
+                size="small"
+              >
+                {showIssues ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+              </IconButton>
             </Box>
-          )}
 
-          {itemIssues.length > 0 && (
-            <Box>
-              <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                Item Issues
-              </Typography>
-              {itemIssues.map((issue, index) => (
-                <Typography key={index} color="error" variant="body2">
-                  • {issue.description} ({issue.numItems} items)
-                </Typography>
-              ))}
-            </Box>
-          )}
-        </Collapse>
+            <Collapse in={showIssues}>
+              {accountIssues.length > 0 && (
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'error.main' }}>
+                    Account Issues
+                  </Typography>
+                  <List dense>
+                    {accountIssues.map((issue, index) => (
+                      <ListItem key={index} sx={{ py: 0 }}>
+                        <ListItemText 
+                          primary={issue.title}
+                          primaryTypographyProps={{
+                            variant: 'body2',
+                            color: 'error.main'
+                          }}
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                </Box>
+              )}
+
+              {itemIssues.length > 0 && (
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'warning.main' }}>
+                    Item Issues
+                  </Typography>
+                  <List dense>
+                    {itemIssues.map((issue, index) => (
+                      <ListItem key={index} sx={{ py: 0 }}>
+                        <ListItemText 
+                          primary={`${issue.description} (${issue.numItems} items)`}
+                          primaryTypographyProps={{
+                            variant: 'body2',
+                            color: 'warning.main'
+                          }}
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                </Box>
+              )}
+            </Collapse>
+          </>
+        )}
       </Box>
     </Card>
   );

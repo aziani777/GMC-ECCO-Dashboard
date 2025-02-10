@@ -8,12 +8,6 @@ const theme = createTheme({
     primary: {
       main: '#2D1B69',
     },
-    success: {
-      main: '#4CAF50',
-    },
-    error: {
-      main: '#f44336',
-    },
   },
 });
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, AppBar, Toolbar } from '@mui/material';
+import { Box, Typography, AppBar } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import MerchantCard from './MerchantCard';
 
@@ -8,13 +8,16 @@ const SideMenu = styled(Box)(({ theme }) => ({
   backgroundColor: '#2D1B69',
   height: '100vh',
   padding: theme.spacing(2),
-  color: 'white'
+  color: 'white',
+  position: 'fixed',
+  left: 0,
+  top: 0
 }));
 
 const MenuItem = styled(Typography)(({ active }) => ({
   padding: '12px 16px',
   marginBottom: '8px',
-  fontSize: '1.1rem',
+  fontSize: '1.2rem',
   borderRadius: '8px',
   cursor: 'pointer',
   backgroundColor: active ? 'rgba(255,255,255,0.1)' : 'transparent',
@@ -23,19 +26,35 @@ const MenuItem = styled(Typography)(({ active }) => ({
   }
 }));
 
+const ContentArea = styled(Box)({
+  marginLeft: 250,
+  padding: '24px'
+});
+
+const LogoContainer = styled(Box)({
+  display: 'flex',
+  alignItems: 'center',
+  marginBottom: '40px',
+  '& img': {
+    height: '30px',
+    marginRight: '10px',
+    filter: 'brightness(0) invert(1)' // Makes the logo white
+  }
+});
+
 const Dashboard = ({ merchants, activeRegion, setActiveRegion }) => {
   return (
     <Box sx={{ display: 'flex' }}>
       <SideMenu>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
-          <img src="/ecco.png" alt="ECCO" style={{ height: 40, marginRight: 10 }} />
-          <img src="/gmc.png" alt="GMC" style={{ height: 30 }} />
-        </Box>
-
-        <Typography variant="h6" sx={{ mb: 3, pl: 2 }}>
-          📊 Dashboard
+        <LogoContainer>
+          <img src="/ecco.png" alt="ECCO" />
+          <img src="/gmc.png" alt="GMC" style={{ height: '24px' }} />
+        </LogoContainer>
+        
+        <Typography variant="h6" sx={{ mb: 3, color: 'rgba(255,255,255,0.7)' }}>
+          Dashboard
         </Typography>
-
+        
         <MenuItem 
           active={activeRegion === 'global'} 
           onClick={() => setActiveRegion('global')}
@@ -51,7 +70,7 @@ const Dashboard = ({ merchants, activeRegion, setActiveRegion }) => {
         </MenuItem>
       </SideMenu>
 
-      <Box sx={{ flexGrow: 1, p: 3 }}>
+      <ContentArea>
         <Typography variant="h5" sx={{ mb: 4 }}>
           ECCO Shoes
         </Typography>
@@ -65,7 +84,7 @@ const Dashboard = ({ merchants, activeRegion, setActiveRegion }) => {
             <MerchantCard key={index} merchant={merchant} />
           ))}
         </Box>
-      </Box>
+      </ContentArea>
     </Box>
   );
 };
