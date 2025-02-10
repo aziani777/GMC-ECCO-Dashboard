@@ -12,8 +12,8 @@ const theme = createTheme({
 });
 
 function App() {
-  const [merchants, setMerchants] = useState({ data: [] });  // Initialize with empty array
-  const [activeRegion, setActiveRegion] = useState('global');
+  const [merchants, setMerchants] = useState(null);
+  const [activeRegion, setActiveRegion] = useState('global'); // Default to global
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -45,33 +45,23 @@ function App() {
     setActiveRegion(newRegion);
   };
 
-  if (loading) {
-    return (
-      <ThemeProvider theme={theme}>
+  return (
+    <ThemeProvider theme={theme}>
+      {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
           <CircularProgress />
         </Box>
-      </ThemeProvider>
-    );
-  }
-
-  if (error) {
-    return (
-      <ThemeProvider theme={theme}>
+      ) : error ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
           <Typography color="error">Error: {error}</Typography>
         </Box>
-      </ThemeProvider>
-    );
-  }
-
-  return (
-    <ThemeProvider theme={theme}>
-      <Dashboard 
-        merchants={merchants}
-        activeRegion={activeRegion}
-        onRegionChange={handleRegionChange}
-      />
+      ) : (
+        <Dashboard 
+          merchants={merchants || { data: [] }}
+          activeRegion={activeRegion || 'global'}
+          onRegionChange={handleRegionChange}
+        />
+      )}
     </ThemeProvider>
   );
 }

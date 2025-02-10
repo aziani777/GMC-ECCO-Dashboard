@@ -41,7 +41,7 @@ const LogoContainer = styled(Box)({
   }
 });
 
-const Dashboard = ({ merchants, activeRegion, onRegionChange }) => {
+const Dashboard = ({ merchants, activeRegion = 'global', onRegionChange }) => {
   console.log('Dashboard props:', { merchants, activeRegion });
 
   const handleGlobalClick = () => {
@@ -53,6 +53,9 @@ const Dashboard = ({ merchants, activeRegion, onRegionChange }) => {
     console.log('Clicking Europe');
     onRegionChange('europe');
   };
+
+  // Ensure we have a valid activeRegion
+  const currentRegion = activeRegion || 'global';
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -82,7 +85,7 @@ const Dashboard = ({ merchants, activeRegion, onRegionChange }) => {
             p: 2,
             border: 'none',
             cursor: 'pointer',
-            bgcolor: activeRegion === 'global' ? 'rgba(255,255,255,0.1)' : 'transparent',
+            bgcolor: currentRegion === 'global' ? 'rgba(255,255,255,0.1)' : 'transparent',
             color: 'white',
             borderRadius: 1,
             mb: 1,
@@ -104,7 +107,7 @@ const Dashboard = ({ merchants, activeRegion, onRegionChange }) => {
             p: 2,
             border: 'none',
             cursor: 'pointer',
-            bgcolor: activeRegion === 'europe' ? 'rgba(255,255,255,0.1)' : 'transparent',
+            bgcolor: currentRegion === 'europe' ? 'rgba(255,255,255,0.1)' : 'transparent',
             color: 'white',
             borderRadius: 1,
             display: 'flex',
@@ -120,7 +123,7 @@ const Dashboard = ({ merchants, activeRegion, onRegionChange }) => {
 
       <ContentArea>
         <Typography variant="h5" sx={{ mb: 4 }}>
-          ECCO Shoes - {activeRegion.toUpperCase()}
+          ECCO Shoes - {currentRegion.toUpperCase()}
         </Typography>
         
         <Box sx={{ 
@@ -128,7 +131,7 @@ const Dashboard = ({ merchants, activeRegion, onRegionChange }) => {
           gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
           gap: 3 
         }}>
-          {merchants?.data?.map((merchant, index) => (
+          {(merchants?.data || []).map((merchant, index) => (
             <MerchantCard key={index} merchant={merchant} />
           ))}
         </Box>
