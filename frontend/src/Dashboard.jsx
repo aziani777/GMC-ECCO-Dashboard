@@ -12,14 +12,15 @@ const Dashboard = ({ selectedRegion }) => {
 
     useEffect(() => {
         const fetchMerchantData = async () => {
-            console.log('Fetching data for region:', selectedRegion);
+            console.log('Starting fetch for region:', selectedRegion);
             try {
                 setLoading(true);
+                setError(null); // Clear any previous errors
                 const data = await fetchMerchants(selectedRegion);
-                console.log('API Response:', data);
+                console.log('Fetch successful, data:', data);
                 setMerchantData(data);
             } catch (err) {
-                console.error('Error fetching data:', err);
+                console.error('Dashboard fetch error:', err);
                 setError(err.message);
             } finally {
                 setLoading(false);
