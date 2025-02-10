@@ -278,94 +278,68 @@ def fetch_merchant_data(merchant_id, account_id):
                 raise
             time.sleep(RETRY_DELAY)
 
+def initialize_content_api():
+    """Initialize the Content API client"""
+    try:
+        credentials_info = json.loads(os.getenv('SERVICE_ACCOUNT_JSON'))
+        credentials = service_account.Credentials.from_service_account_info(
+            credentials_info,
+            scopes=['https://www.googleapis.com/auth/content']
+        )
+        return build('content', 'v2.1', credentials=credentials)
+    except Exception as e:
+        app.logger.error(f"Error initializing Content API: {str(e)}")
+        raise
+
+def get_merchant_status(service, merchant):
+    """Get status for a single merchant"""
+    try:
+        status = service.accounts().get(
+            merchantId=merchant['account_id'],
+            accountId=merchant.get('merchantId', merchant['account_id'])
+        ).execute()
+        
+        return {
+            'name': merchant['name'],
+            'accountId': merchant['account_id'],
+            'status': status.get('accountStatus'),
+            'issues': status.get('issues', [])
+        }
+    except Exception as e:
+        app.logger.error(f"Error getting status for {merchant['name']}: {str(e)}")
+        return {
+            'name': merchant['name'],
+            'accountId': merchant['account_id'],
+            'error': str(e)
+        }
+
 @app.route('/api/merchants/<region>')
 def get_merchants(region):
     try:
-        service = initialize_service()
-        spreadsheet_id = os.getenv('GOOGLE_SHEETS_ID', '1MJhDCmuvP5TADNGZL-NXwolf-gVU_v0cX17Mw3FE7nQ')
-        
-        # Change range to include headers (row 1)
-        range_name = f"'{region}'!A1:Z"  # Changed from A2:Z to A1:Z
+        service = initialize_content_api()
+        merchants = app.config['GLOBAL_MERCHANTS'] if region == 'global' else app.config['EUROPE_MERCHANTS']
         
         app.logger.info(f"Fetching data for region: {region}")
-        app.logger.info(f"Using spreadsheet ID: {spreadsheet_id}")
-        app.logger.info(f"Using range: {range_name}")
         
-        try:
-            result = service.spreadsheets().values().get(
-                spreadsheetId=spreadsheet_id,
-                range=range_name
-            ).execute()
-            
-            values = result.get('values', [])
-            if not values:
-                app.logger.warning("No data found in spreadsheet")
-                return jsonify({"error": "No data found"}), 404
-            
-            # Separate headers and data
-            headers = values[0] if values else []
-            data = values[1:] if len(values) > 1 else []
-                
-            return jsonify({
-                f"ECCO {region.upper()}": {
-                    "name": f"ECCO {region.upper()}",
-                    "headers": headers,
-                    "data": data
-                }
-            })
-        except Exception as e:
-            app.logger.error(f"Google Sheets API error: {str(e)}")
-            return jsonify({"error": f"Google Sheets API error: {str(e)}"}), 500
-            
+        # Get status for all merchants in parallel
+        merchant_data = []
+        for merchant in merchants:
+            status = get_merchant_status(service, merchant)
+            merchant_data.append(status)
+        
+        return jsonify({
+            f"ECCO {region.upper()}": {
+                "name": f"ECCO {region.upper()}",
+                "data": merchant_data
+            }
+        })
     except Exception as e:
         app.logger.error(f"Server error in get_merchants: {str(e)}")
         return jsonify({"error": f"Server error: {str(e)}"}), 500
 
-@app.route('/api/merchants/europe')
-def get_merchant_status():
-    try:
-        service = build('content', 'v2.1', credentials=credentials)
-        account_statuses = {}
-        
-        # Define merchants with their IDs and country codes
-        merchants = {
-            'ECCO DE': {'merchantId': '117076029', 'country': 'DE'},
-            'ECCO GB': {'merchantId': '115079344', 'country': 'GB'},
-            'ECCO FR': {'merchantId': '115975194', 'country': 'FR'}
-        }
-
-        # Get the full status list once using the main account ID
-        status_list = service.accountstatuses().list(
-            merchantId='117117533'
-        ).execute()
-
-        # Process each merchant
-        for merchant_name, info in merchants.items():
-            # Find the matching status for this merchant
-            merchant_status = None
-            for status in status_list.get('resources', []):
-                if str(status.get('accountId')) == str(info['merchantId']):
-                    merchant_status = status
-                    break
-
-            if merchant_status:
-                shopping_data = {
-                    'products': [
-                        product for product in merchant_status.get('products', [])
-                        if (product.get('country') == info['country'] and 
-                            product.get('destination') == 'Shopping' and 
-                            product.get('channel') == 'online')
-                    ]
-                }
-            else:
-                shopping_data = {'products': []}
-            
-            account_statuses[merchant_name] = shopping_data
-
-        return jsonify({"ECCO EU": account_statuses})
-    except Exception as e:
-        app.logger.error(f"Error getting account status: {str(e)}")
-        return jsonify({'error': str(e)}), 500
+@app.route('/health')
+def health_check():
+    return jsonify({"status": "healthy"}), 200
 
 def cleanup():
     session.close()
@@ -380,11 +354,6 @@ def serve_frontend():
 @app.route('/<path:path>')
 def serve_static(path):
     return send_from_directory('../frontend', path)
-
-# Add a health check endpoint
-@app.route('/health')
-def health_check():
-    return jsonify({"status": "healthy"}), 200
 
 if __name__ == '__main__':
     port = int(environ.get('PORT', 5001))
