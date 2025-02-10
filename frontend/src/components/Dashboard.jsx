@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Grid } from '@mui/material';
 import MerchantCard from './MerchantCard';
+import { fetchMerchants } from '../api';
 
 const Dashboard = ({ selectedRegion }) => {
   const [merchantData, setMerchantData] = useState({});
@@ -11,15 +12,15 @@ const Dashboard = ({ selectedRegion }) => {
 
   useEffect(() => {
     const fetchMerchantData = async () => {
-      console.log('Fetching data for region:', selectedRegion);
+      console.log('Starting fetch for region:', selectedRegion);
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:5001/api/merchants/${selectedRegion}`);
-        const data = await response.json();
-        console.log('API Response:', data);
+        setError(null);
+        const data = await fetchMerchants(selectedRegion);
+        console.log('Fetch successful, data:', data);
         setMerchantData(data);
       } catch (err) {
-        console.error('Error fetching data:', err);
+        console.error('Dashboard fetch error:', err);
         setError(err.message);
       } finally {
         setLoading(false);
