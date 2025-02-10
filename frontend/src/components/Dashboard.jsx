@@ -41,21 +41,8 @@ const LogoContainer = styled(Box)({
   }
 });
 
-const Dashboard = ({ merchants, activeRegion = 'global', onRegionChange }) => {
-  console.log('Dashboard props:', { merchants, activeRegion });
-
-  const handleGlobalClick = () => {
-    console.log('Clicking Global');
-    onRegionChange('global');
-  };
-
-  const handleEuropeClick = () => {
-    console.log('Clicking Europe');
-    onRegionChange('europe');
-  };
-
-  // Ensure we have a valid activeRegion
-  const currentRegion = activeRegion || 'global';
+const Dashboard = ({ merchants, activeRegion = 'global', setActiveRegion }) => {
+  console.log('Dashboard props:', { merchants, activeRegion, setActiveRegion });
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -78,52 +65,46 @@ const Dashboard = ({ merchants, activeRegion = 'global', onRegionChange }) => {
         </Typography>
         
         <Box 
-          component="button"
-          onClick={handleGlobalClick}
+          onClick={() => {
+            console.log('Clicking Global');
+            setActiveRegion('global');
+          }}
           sx={{
-            width: '100%',
             p: 2,
-            border: 'none',
             cursor: 'pointer',
-            bgcolor: currentRegion === 'global' ? 'rgba(255,255,255,0.1)' : 'transparent',
-            color: 'white',
+            bgcolor: activeRegion === 'global' ? 'rgba(255,255,255,0.1)' : 'transparent',
             borderRadius: 1,
             mb: 1,
-            display: 'flex',
-            alignItems: 'center',
             '&:hover': {
               bgcolor: 'rgba(255,255,255,0.1)'
             }
           }}
         >
-          <Typography>🌐 Global</Typography>
+          <Typography sx={{ color: 'white' }}>🌐 Global</Typography>
         </Box>
         
         <Box 
-          component="button"
-          onClick={handleEuropeClick}
+          onClick={() => {
+            console.log('Clicking Europe');
+            setActiveRegion('europe');
+          }}
           sx={{
-            width: '100%',
             p: 2,
-            border: 'none',
             cursor: 'pointer',
-            bgcolor: currentRegion === 'europe' ? 'rgba(255,255,255,0.1)' : 'transparent',
-            color: 'white',
+            bgcolor: activeRegion === 'europe' ? 'rgba(255,255,255,0.1)' : 'transparent',
             borderRadius: 1,
-            display: 'flex',
-            alignItems: 'center',
             '&:hover': {
               bgcolor: 'rgba(255,255,255,0.1)'
             }
           }}
         >
-          <Typography>🌍 Europe</Typography>
+          <Typography sx={{ color: 'white' }}>🌍 Europe</Typography>
         </Box>
       </SideMenu>
 
       <ContentArea>
         <Typography variant="h5" sx={{ mb: 4 }}>
-          ECCO Shoes - {currentRegion.toUpperCase()}
+          ECCO Shoes - {activeRegion.toUpperCase()}
         </Typography>
         
         <Box sx={{ 

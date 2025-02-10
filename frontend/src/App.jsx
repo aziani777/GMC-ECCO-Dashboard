@@ -13,7 +13,7 @@ const theme = createTheme({
 
 function App() {
   const [merchants, setMerchants] = useState(null);
-  const [activeRegion, setActiveRegion] = useState('global'); // Default to global
+  const [activeRegion, setActiveRegion] = useState('global');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -40,11 +40,6 @@ function App() {
     fetchMerchants();
   }, [activeRegion]);
 
-  const handleRegionChange = (newRegion) => {
-    console.log('Changing region to:', newRegion);
-    setActiveRegion(newRegion);
-  };
-
   return (
     <ThemeProvider theme={theme}>
       {loading ? (
@@ -58,8 +53,8 @@ function App() {
       ) : (
         <Dashboard 
           merchants={merchants || { data: [] }}
-          activeRegion={activeRegion || 'global'}
-          onRegionChange={handleRegionChange}
+          activeRegion={activeRegion}
+          setActiveRegion={setActiveRegion}
         />
       )}
     </ThemeProvider>
