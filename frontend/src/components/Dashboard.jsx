@@ -64,14 +64,12 @@ const Dashboard = ({ merchants, activeRegion = 'global', setActiveRegion }) => {
           Dashboard
         </Typography>
         
-        <Box 
-          onClick={() => {
-            console.log('Clicking Global');
-            setActiveRegion('global');
-          }}
+        <div 
+          role="button"
+          onClick={() => setActiveRegion('global')}
+          style={{ cursor: 'pointer' }}
           sx={{
             p: 2,
-            cursor: 'pointer',
             bgcolor: activeRegion === 'global' ? 'rgba(255,255,255,0.1)' : 'transparent',
             borderRadius: 1,
             mb: 1,
@@ -81,16 +79,14 @@ const Dashboard = ({ merchants, activeRegion = 'global', setActiveRegion }) => {
           }}
         >
           <Typography sx={{ color: 'white' }}>🌐 Global</Typography>
-        </Box>
+        </div>
         
-        <Box 
-          onClick={() => {
-            console.log('Clicking Europe');
-            setActiveRegion('europe');
-          }}
+        <div 
+          role="button"
+          onClick={() => setActiveRegion('europe')}
+          style={{ cursor: 'pointer' }}
           sx={{
             p: 2,
-            cursor: 'pointer',
             bgcolor: activeRegion === 'europe' ? 'rgba(255,255,255,0.1)' : 'transparent',
             borderRadius: 1,
             '&:hover': {
@@ -99,7 +95,7 @@ const Dashboard = ({ merchants, activeRegion = 'global', setActiveRegion }) => {
           }}
         >
           <Typography sx={{ color: 'white' }}>🌍 Europe</Typography>
-        </Box>
+        </div>
       </SideMenu>
 
       <ContentArea>
