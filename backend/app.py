@@ -18,7 +18,9 @@ def after_request(response):
 GLOBAL_MERCHANTS = [
     {'merchant_id': '6000402', 'name': 'ECCO US'},    # US
     {'merchant_id': '126580264', 'name': 'ECCO CA'},  # CA
-    {'merchant_id': '124463984', 'name': 'ECCO AU'}   # AU
+    {'merchant_id': '124463984', 'name': 'ECCO AU'},   # AU
+    {'merchant_id': '140206364', 'name': 'ECCO SG'},   # SG
+    {'merchant_id': '581740437', 'name': 'ECCO MY'}   # MY
 ]
 
 EUROPE_MERCHANTS = [

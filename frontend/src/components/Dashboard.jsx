@@ -76,7 +76,9 @@ const Dashboard = () => {
   const isGlobalMarket = (merchantName) => {
     return merchantName.includes('US') || 
            merchantName.includes('CA') || 
-           merchantName.includes('AU');
+           merchantName.includes('AU') || 
+           merchantName.includes('SG') || 
+           merchantName.includes('MY');
   };
 
   const isEuropeanMarket = (merchantName) => {
