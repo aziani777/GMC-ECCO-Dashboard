@@ -2,8 +2,10 @@ import { API_BASE_URL } from './config';
 
 const fetchMerchants = async (region) => {
     try {
-        console.log('Fetching from:', `${API_BASE_URL}/api/merchants/${region}`); // Debug log
-        const response = await fetch(`${API_BASE_URL}/api/merchants/${region}`, {
+        const url = `${API_BASE_URL}/api/merchants/${region}`;
+        console.log('Fetching from:', url); // Debug log
+        
+        const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -12,8 +14,11 @@ const fetchMerchants = async (region) => {
         });
         
         if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Response not OK:', response.status, errorText);
             throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
         const data = await response.json();
         console.log('Response data:', data); // Debug log
         return data;
