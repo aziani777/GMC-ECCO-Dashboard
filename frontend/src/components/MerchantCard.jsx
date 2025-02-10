@@ -8,135 +8,102 @@ import {
   AccordionDetails,
   Chip,
   Box,
-  Divider
+  Divider,
+  Collapse,
+  IconButton
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ErrorIcon from '@mui/icons-material/Error';
 import WarningIcon from '@mui/icons-material/Warning';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import '../styles/MerchantCard.css';
 
 const MerchantCard = ({ merchant }) => {
   const [expanded, setExpanded] = useState(false);
+  const [showIssues, setShowIssues] = useState(false);
+  
+  // Extract statistics from merchant data
+  const stats = merchant?.data?.products?.[0]?.statistics || {};
+  const accountIssues = merchant?.data?.accountLevelIssues || [];
+  const itemIssues = merchant?.data?.products?.[0]?.itemLevelIssues || [];
 
   return (
-    <Card className="merchant-card">
-      <CardContent>
-        {/* Header: Name and Account Status */}
-        <Box display="flex" alignItems="center" mb={2}>
-          <Typography variant="h5" component="div">
-            {merchant.name}
+    <Card className="merchant-card" sx={{
+      width: 300,
+      height: 'fit-content',
+      m: 2,
+      p: 3,
+      backgroundColor: '#f5f9ff',
+      borderRadius: 2,
+      boxShadow: 3
+    }}>
+      <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
+        {merchant.name}
+      </Typography>
+
+      <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+        <Box sx={{ 
+          p: 2, 
+          bgcolor: '#fff', 
+          borderRadius: 1,
+          textAlign: 'center'
+        }}>
+          <Typography variant="h4" color="success.main">
+            {stats.active || 0}
           </Typography>
-          {merchant.accountStatus && (
-            <Chip
-              label={merchant.accountStatus.status}
-              color={merchant.accountStatus.status === 'Active' ? 'success' : 'error'}
-              size="small"
-              sx={{ ml: 2 }}
-            />
-          )}
+          <Typography>Approved</Typography>
         </Box>
+        
+        <Box sx={{ 
+          p: 2, 
+          bgcolor: '#fff', 
+          borderRadius: 1,
+          textAlign: 'center'
+        }}>
+          <Typography variant="h4" color="error.main">
+            {stats.disapproved || 0}
+          </Typography>
+          <Typography>Disapproved</Typography>
+        </Box>
+      </Box>
 
-        {/* Product Status Section */}
-        <Typography variant="h6" gutterBottom>
-          Product Status
-        </Typography>
-        <div className="status-grid">
-          <div className="status-item">
-            <Typography color="success.main" variant="h4">
-              {merchant.productStatus?.approved || 0}
-            </Typography>
-            <Typography>Approved</Typography>
-          </div>
-          <div className="status-item">
-            <Typography color="error.main" variant="h4">
-              {merchant.productStatus?.disapproved || 0}
-            </Typography>
-            <Typography>Disapproved</Typography>
-          </div>
-          <div className="status-item">
-            <Typography color="warning.main" variant="h4">
-              {merchant.productStatus?.pending || 0}
-            </Typography>
-            <Typography>Pending</Typography>
-          </div>
-          <div className="status-item">
-            <Typography color="text.secondary" variant="h4">
-              {merchant.productStatus?.expired || 0}
-            </Typography>
-            <Typography>Expired</Typography>
-          </div>
-        </div>
-
-        {/* Account Level Issues */}
-        {merchant.accountStatus?.issues?.length > 0 && (
-          <Box mt={3}>
-            <Typography variant="h6" gutterBottom color="error">
-              Account Level Issues
-            </Typography>
-            {merchant.accountStatus.issues.map((issue, index) => (
-              <Box key={index} mb={1}>
-                <Typography variant="body2" color="error">
-                  • {issue.title || issue.detail}
+      <Box sx={{ mt: 2 }}>
+        <IconButton 
+          onClick={() => setShowIssues(!showIssues)}
+          sx={{ width: '100%' }}
+        >
+          {showIssues ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+        </IconButton>
+        
+        <Collapse in={showIssues}>
+          {accountIssues.length > 0 && (
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                Account Issues
+              </Typography>
+              {accountIssues.map((issue, index) => (
+                <Typography key={index} color="error" variant="body2">
+                  • {issue.title}
                 </Typography>
-              </Box>
-            ))}
-          </Box>
-        )}
+              ))}
+            </Box>
+          )}
 
-        {/* Item Level Issues */}
-        {merchant.itemLevelIssues?.length > 0 && (
-          <Box mt={3}>
-            <Accordion 
-              expanded={expanded} 
-              onChange={() => setExpanded(!expanded)}
-              sx={{ backgroundColor: '#f8f9fa' }}
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Box display="flex" alignItems="center">
-                  <Typography variant="h6">
-                    Item Level Issues ({merchant.itemLevelIssues.length})
-                  </Typography>
-                </Box>
-              </AccordionSummary>
-              <AccordionDetails>
-                {merchant.itemLevelIssues.map((issue, index) => (
-                  <Box key={index} mb={2}>
-                    <Box display="flex" alignItems="center" gap={1}>
-                      {issue.severity === 'error' ? (
-                        <ErrorIcon color="error" fontSize="small" />
-                      ) : (
-                        <WarningIcon color="warning" fontSize="small" />
-                      )}
-                      <Typography variant="subtitle2">
-                        {issue.code.replace(/_/g, ' ').toUpperCase()}
-                      </Typography>
-                      <Chip 
-                        label={`${issue.count} items`}
-                        size="small"
-                        color={issue.severity === 'error' ? 'error' : 'warning'}
-                      />
-                    </Box>
-                    <Typography variant="body2" color="text.secondary" mt={1}>
-                      {issue.detail}
-                    </Typography>
-                    {issue.documentation && (
-                      <a
-                        href={issue.documentation}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="documentation-link"
-                      >
-                        View Documentation
-                      </a>
-                    )}
-                    {index < merchant.itemLevelIssues.length - 1 && <Divider sx={{ my: 2 }} />}
-                  </Box>
-                ))}
-              </AccordionDetails>
-            </Accordion>
-          </Box>
-        )}
-      </CardContent>
+          {itemIssues.length > 0 && (
+            <Box>
+              <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                Item Issues
+              </Typography>
+              {itemIssues.map((issue, index) => (
+                <Typography key={index} color="error" variant="body2">
+                  • {issue.description} ({issue.numItems} items)
+                </Typography>
+              ))}
+            </Box>
+          )}
+        </Collapse>
+      </Box>
     </Card>
   );
 };

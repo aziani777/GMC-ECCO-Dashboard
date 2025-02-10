@@ -1,50 +1,72 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Grid } from '@mui/material';
+import React from 'react';
+import { Box, Typography, AppBar, Toolbar } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import MerchantCard from './MerchantCard';
-import { fetchMerchants } from '../api';
 
-const Dashboard = ({ selectedRegion }) => {
-  const [merchantData, setMerchantData] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+const SideMenu = styled(Box)(({ theme }) => ({
+  width: 250,
+  backgroundColor: '#2D1B69',
+  height: '100vh',
+  padding: theme.spacing(2),
+  color: 'white'
+}));
 
-  console.log('Selected Region:', selectedRegion);
+const MenuItem = styled(Typography)(({ active }) => ({
+  padding: '12px 16px',
+  marginBottom: '8px',
+  fontSize: '1.1rem',
+  borderRadius: '8px',
+  cursor: 'pointer',
+  backgroundColor: active ? 'rgba(255,255,255,0.1)' : 'transparent',
+  '&:hover': {
+    backgroundColor: 'rgba(255,255,255,0.1)'
+  }
+}));
 
-  useEffect(() => {
-    const fetchMerchantData = async () => {
-      console.log('Starting fetch for region:', selectedRegion);
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await fetchMerchants(selectedRegion);
-        console.log('Fetch successful, data:', data);
-        setMerchantData(data);
-      } catch (err) {
-        console.error('Dashboard fetch error:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMerchantData();
-  }, [selectedRegion]);
-
-  console.log('Current merchant data:', merchantData);
-
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-
+const Dashboard = ({ merchants, activeRegion, setActiveRegion }) => {
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Grid container spacing={3}>
-        {Object.entries(merchantData).map(([merchantName, merchant]) => (
-          <Grid item xs={12} key={merchantName}>
-            <MerchantCard merchant={merchant} />
-          </Grid>
-        ))}
-      </Grid>
-    </Container>
+    <Box sx={{ display: 'flex' }}>
+      <SideMenu>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
+          <img src="/ecco.png" alt="ECCO" style={{ height: 40, marginRight: 10 }} />
+          <img src="/gmc.png" alt="GMC" style={{ height: 30 }} />
+        </Box>
+
+        <Typography variant="h6" sx={{ mb: 3, pl: 2 }}>
+          📊 Dashboard
+        </Typography>
+
+        <MenuItem 
+          active={activeRegion === 'global'} 
+          onClick={() => setActiveRegion('global')}
+        >
+          🌐 Global
+        </MenuItem>
+        
+        <MenuItem 
+          active={activeRegion === 'europe'} 
+          onClick={() => setActiveRegion('europe')}
+        >
+          🌍 Europe
+        </MenuItem>
+      </SideMenu>
+
+      <Box sx={{ flexGrow: 1, p: 3 }}>
+        <Typography variant="h5" sx={{ mb: 4 }}>
+          ECCO Shoes
+        </Typography>
+        
+        <Box sx={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+          gap: 3 
+        }}>
+          {merchants?.data?.map((merchant, index) => (
+            <MerchantCard key={index} merchant={merchant} />
+          ))}
+        </Box>
+      </Box>
+    </Box>
   );
 };
 
