@@ -84,7 +84,25 @@ const Dashboard = () => {
   const isEuropeanMarket = (merchantName) => {
     return merchantName.includes('GB') || 
            merchantName.includes('FR') || 
-           merchantName.includes('DE');
+           merchantName.includes('DE') || 
+           merchantName.includes('AT') || 
+           merchantName.includes('BE') || 
+           merchantName.includes('CH') || 
+           merchantName.includes('CZ') || 
+           merchantName.includes('DK') || 
+           merchantName.includes('RO') || 
+           merchantName.includes('ES') || 
+           merchantName.includes('FI') || 
+           merchantName.includes('HU') || 
+           merchantName.includes('IE') || 
+           merchantName.includes('LT') || 
+           merchantName.includes('LV') || 
+           merchantName.includes('NL') || 
+           merchantName.includes('NO') || 
+           merchantName.includes('PL') || 
+           merchantName.includes('PT') || 
+           merchantName.includes('SE') || 
+           merchantName.includes('SK');
   };
 
   const filterMerchantsByRegion = (merchants, region) => {

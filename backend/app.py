@@ -24,10 +24,28 @@ GLOBAL_MERCHANTS = [
 ]
 
 EUROPE_MERCHANTS = [
-    {'merchant_id': '115079344', 'name': 'ECCO GB'},
-    {'merchant_id': '115975194', 'name': 'ECCO FR'},
-    {'merchant_id': '117076029', 'name': 'ECCO DE'}
-]
+  {'merchant_id': '115079344', 'name': 'ECCO GB'},
+  {'merchant_id': '115975194', 'name': 'ECCO FR'},
+  {'merchant_id': '117076029', 'name': 'ECCO DE'},
+  {'merchant_id': '117080005', 'name': 'ECCO AT'},
+  {'merchant_id': '117080236', 'name': 'ECCO BE'},
+  {'merchant_id': '143394353', 'name': 'ECCO CH'},
+  {'merchant_id': '137169222', 'name': 'ECCO CZ'},
+  {'merchant_id': '115432148', 'name': 'ECCO DK'},
+  {'merchant_id': '143378754', 'name': 'ECCO RO'},
+  {'merchant_id': '5295120833', 'name': 'ECCO ES'},
+  {'merchant_id': '137169270', 'name': 'ECCO FI'},
+  {'merchant_id': '511182969', 'name': 'ECCO HU'},
+  {'merchant_id': '117076011', 'name': 'ECCO IE'},
+  {'merchant_id': '5311441059', 'name': 'ECCO LT'},
+  {'merchant_id': '5311441299', 'name': 'ECCO LV'},
+  {'merchant_id': '117088301', 'name': 'ECCO NL'},
+  {'merchant_id': '115421472', 'name': 'ECCO NO'},
+  {'merchant_id': '113564601', 'name': 'ECCO PL'},
+  {'merchant_id': '273571427', 'name': 'ECCO PT'},
+  {'merchant_id': '115432394', 'name': 'ECCO SE'},
+  {'merchant_id': '137179415', 'name': 'ECCO SK'}
+];
 
 def initialize_content_api():
     try:
