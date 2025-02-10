@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Typography, CircularProgress, Box } from '@mui/material';
 import Dashboard from './components/Dashboard';
@@ -16,6 +16,12 @@ function App() {
   const [activeRegion, setActiveRegion] = useState('global');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Memoize the region change handler
+  const handleRegionChange = useCallback((region) => {
+    console.log('Changing region to:', region);
+    setActiveRegion(region);
+  }, []);
 
   useEffect(() => {
     const fetchMerchants = async () => {
@@ -52,9 +58,9 @@ function App() {
         </Box>
       ) : (
         <Dashboard 
-          merchants={merchants || { data: [] }}
+          merchants={merchants}
           activeRegion={activeRegion}
-          setActiveRegion={setActiveRegion}
+          onRegionChange={handleRegionChange}
         />
       )}
     </ThemeProvider>

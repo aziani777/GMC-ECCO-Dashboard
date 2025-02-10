@@ -41,8 +41,15 @@ const LogoContainer = styled(Box)({
   }
 });
 
-const Dashboard = ({ merchants, activeRegion = 'global', setActiveRegion }) => {
-  console.log('Dashboard props:', { merchants, activeRegion, setActiveRegion });
+const Dashboard = ({ merchants, activeRegion = 'global', onRegionChange }) => {
+  console.log('Dashboard props:', { merchants, activeRegion, onRegionChange });
+
+  const handleRegionClick = (region) => {
+    console.log('Clicking region:', region);
+    if (onRegionChange) {
+      onRegionChange(region);
+    }
+  };
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -66,7 +73,7 @@ const Dashboard = ({ merchants, activeRegion = 'global', setActiveRegion }) => {
         
         <Button
           fullWidth
-          onClick={() => setActiveRegion('global')}
+          onClick={() => handleRegionClick('global')}
           sx={{
             p: 2,
             justifyContent: 'flex-start',
@@ -84,7 +91,7 @@ const Dashboard = ({ merchants, activeRegion = 'global', setActiveRegion }) => {
         
         <Button
           fullWidth
-          onClick={() => setActiveRegion('europe')}
+          onClick={() => handleRegionClick('europe')}
           sx={{
             p: 2,
             justifyContent: 'flex-start',
