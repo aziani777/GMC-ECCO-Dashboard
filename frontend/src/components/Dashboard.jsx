@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Button, CircularProgress } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import MerchantCard from './MerchantCard';
 import { updateMerchantDisplay } from '../script';  // Import the new function
@@ -61,15 +61,27 @@ const MenuButton = styled(Box)(({ theme, active }) => ({
 
 const Dashboard = ({ activeRegion = 'global', onRegionChange }) => {
   const [merchantData, setMerchantData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);  // Add loading state
 
   const handleClick = async (region) => {
     console.log('Clicking region:', region);
     if (typeof onRegionChange === 'function') {
       onRegionChange(region);
     }
-    // Fetch and update merchant data
-    const merchants = await updateMerchantDisplay(region);
-    setMerchantData(merchants);
+    
+    // Set loading state
+    setIsLoading(true);
+    try {
+      // Fetch and update merchant data
+      const merchants = await updateMerchantDisplay(region);
+      console.log('Fetched merchants:', merchants);  // Debug log
+      setMerchantData(merchants || []);
+    } catch (error) {
+      console.error('Error fetching merchants:', error);
+      setMerchantData([]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Initial data fetch
@@ -101,6 +113,7 @@ const Dashboard = ({ activeRegion = 'global', onRegionChange }) => {
           fullWidth
           variant="text"
           onClick={() => handleClick('global')}
+          disabled={isLoading}  // Disable while loading
           sx={{
             justifyContent: 'flex-start',
             color: 'white',
@@ -118,6 +131,7 @@ const Dashboard = ({ activeRegion = 'global', onRegionChange }) => {
           fullWidth
           variant="text"
           onClick={() => handleClick('europe')}
+          disabled={isLoading}  // Disable while loading
           sx={{
             justifyContent: 'flex-start',
             color: 'white',
@@ -136,15 +150,30 @@ const Dashboard = ({ activeRegion = 'global', onRegionChange }) => {
           ECCO Shoes - {activeRegion?.toUpperCase() || 'GLOBAL'}
         </Typography>
         
-        <Box sx={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-          gap: 3 
-        }}>
-          {merchantData.map((merchant, index) => (
-            <MerchantCard key={index} merchant={merchant} />
-          ))}
-        </Box>
+        {isLoading ? (
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column',
+            alignItems: 'center', 
+            justifyContent: 'center',
+            minHeight: '200px'
+          }}>
+            <CircularProgress sx={{ mb: 2 }} />
+            <Typography>Loading data. Please wait...</Typography>
+          </Box>
+        ) : merchantData.length > 0 ? (
+          <Box sx={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+            gap: 3 
+          }}>
+            {merchantData.map((merchant, index) => (
+              <MerchantCard key={index} merchant={merchant} />
+            ))}
+          </Box>
+        ) : (
+          <Typography>No merchant data available for this region.</Typography>
+        )}
       </ContentArea>
     </Box>
   );
