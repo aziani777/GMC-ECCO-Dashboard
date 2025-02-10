@@ -49,7 +49,7 @@ const Dashboard = ({ data, activeRegion, setActiveRegion }) => {
   const regionKey = `ECCO ${activeRegion?.toUpperCase()}`;
   const merchants = data?.[regionKey]?.data || [];
 
-  // Define explicit handler functions
+  // Define explicit handler functions with arrow function syntax
   const handleGlobalClick = () => {
     console.log('Clicking Global');
     setActiveRegion('global');
@@ -64,8 +64,16 @@ const Dashboard = ({ data, activeRegion, setActiveRegion }) => {
     <Box sx={{ display: 'flex' }}>
       <SideMenu>
         <LogoContainer>
-          <img src="/ecco.png" alt="ECCO" />
-          <img src="/gmc.png" alt="GMC" style={{ height: '24px' }} />
+          <img 
+            src="/ecco.png" 
+            alt="ECCO" 
+            style={{ filter: 'brightness(0) invert(1)' }} // Makes the logo white
+          />
+          <img 
+            src="/gmc.png" 
+            alt="GMC" 
+            style={{ height: '24px', filter: 'brightness(0) invert(1)' }} 
+          />
         </LogoContainer>
         
         <Typography variant="h6" sx={{ mb: 3, color: 'rgba(255,255,255,0.7)' }}>
@@ -73,46 +81,34 @@ const Dashboard = ({ data, activeRegion, setActiveRegion }) => {
         </Typography>
         
         <Box 
-          component="button"  // Make it a button element
-          onClick={handleGlobalClick}  // Use the explicit handler
+          onClick={handleGlobalClick}
           sx={{
             p: 2,
-            width: '100%',
             cursor: 'pointer',
             bgcolor: activeRegion === 'global' ? 'rgba(255,255,255,0.1)' : 'transparent',
-            border: 'none',  // Remove button border
-            color: 'white',  // Text color
             borderRadius: 1,
             mb: 1,
-            display: 'flex',
-            alignItems: 'center',
             '&:hover': {
               bgcolor: 'rgba(255,255,255,0.1)'
             }
           }}
         >
-          <Typography>🌐 Global</Typography>
+          <Typography sx={{ color: 'white' }}>🌐 Global</Typography>
         </Box>
         
         <Box 
-          component="button"  // Make it a button element
-          onClick={handleEuropeClick}  // Use the explicit handler
+          onClick={handleEuropeClick}
           sx={{
             p: 2,
-            width: '100%',
             cursor: 'pointer',
             bgcolor: activeRegion === 'europe' ? 'rgba(255,255,255,0.1)' : 'transparent',
-            border: 'none',  // Remove button border
-            color: 'white',  // Text color
             borderRadius: 1,
-            display: 'flex',
-            alignItems: 'center',
             '&:hover': {
               bgcolor: 'rgba(255,255,255,0.1)'
             }
           }}
         >
-          <Typography>🌍 Europe</Typography>
+          <Typography sx={{ color: 'white' }}>🌍 Europe</Typography>
         </Box>
       </SideMenu>
 
