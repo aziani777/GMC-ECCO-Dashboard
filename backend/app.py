@@ -101,12 +101,18 @@ BASE_DIR = Path(__file__).resolve().parent
 SERVICE_ACCOUNT_FILE = BASE_DIR / 'config' / 'service_account.json'
 
 def get_service_account_info():
-    if 'SERVICE_ACCOUNT_JSON' in environ:
-        try:
-            return json.loads(environ['SERVICE_ACCOUNT_JSON'])
-        except json.JSONDecodeError:
-            raise Exception("Invalid SERVICE_ACCOUNT_JSON environment variable")
-    raise Exception("SERVICE_ACCOUNT_JSON environment variable is required")
+    # First try environment variable
+    service_account_json = os.getenv('SERVICE_ACCOUNT_JSON')
+    if service_account_json:
+        return json.loads(service_account_json)
+    
+    # Then try file path
+    file_path = '/etc/secrets/service-account.json'
+    try:
+        with open(file_path) as f:
+            return json.load(f)
+    except:
+        raise Exception("SERVICE_ACCOUNT_JSON environment variable or file is required")
 
 # Initialize credentials
 credentials = service_account.Credentials.from_service_account_info(
@@ -116,28 +122,20 @@ credentials = service_account.Credentials.from_service_account_info(
 
 # Initialize the Google API service
 def initialize_service():
-    SCOPES = ['https://www.googleapis.com/auth/content']
-    
-    # Update path to point to the config directory
-    SERVICE_ACCOUNT_FILE = os.path.join(
-        os.path.dirname(__file__), 
-        'config', 
-        'service_account.json'
-    )
-    
-    if not os.path.exists(SERVICE_ACCOUNT_FILE):
-        raise FileNotFoundError(
-            f"Service account file not found at {SERVICE_ACCOUNT_FILE}. "
-            "Please ensure the service account JSON file exists in the config directory."
-        )
-    
+    """Initialize and return the Google Sheets service."""
     try:
-        credentials = service_account.Credentials.from_service_account_file(
-            SERVICE_ACCOUNT_FILE, scopes=SCOPES)
-        return build('content', 'v2.1', credentials=credentials)
+        # Get credentials from environment variable
+        credentials_info = get_service_account_info()
+        credentials = service_account.Credentials.from_service_account_info(
+            credentials_info,
+            scopes=['https://www.googleapis.com/auth/spreadsheets.readonly']
+        )
+        
+        # Build and return the service
+        service = build('sheets', 'v4', credentials=credentials)
+        return service
     except Exception as e:
-        print(f"Error initializing service: {str(e)}")
-        raise
+        raise Exception(f"Failed to initialize Google Sheets service: {str(e)}")
 
 # Create the service instance
 service = initialize_service()
