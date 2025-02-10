@@ -283,11 +283,13 @@ def get_merchants(region):
     try:
         service = initialize_service()
         spreadsheet_id = os.getenv('GOOGLE_SHEETS_ID', '1MJhDCmuvP5TADNGZL-NXwolf-gVU_v0cX17Mw3FE7nQ')
-        range_name = f'{region}!A2:Z'
         
-        # Add debug logging
+        # Change range to include headers (row 1)
+        range_name = f"'{region}'!A1:Z"  # Changed from A2:Z to A1:Z
+        
         app.logger.info(f"Fetching data for region: {region}")
         app.logger.info(f"Using spreadsheet ID: {spreadsheet_id}")
+        app.logger.info(f"Using range: {range_name}")
         
         try:
             result = service.spreadsheets().values().get(
@@ -299,11 +301,16 @@ def get_merchants(region):
             if not values:
                 app.logger.warning("No data found in spreadsheet")
                 return jsonify({"error": "No data found"}), 404
+            
+            # Separate headers and data
+            headers = values[0] if values else []
+            data = values[1:] if len(values) > 1 else []
                 
             return jsonify({
                 f"ECCO {region.upper()}": {
                     "name": f"ECCO {region.upper()}",
-                    "data": values
+                    "headers": headers,
+                    "data": data
                 }
             })
         except Exception as e:
