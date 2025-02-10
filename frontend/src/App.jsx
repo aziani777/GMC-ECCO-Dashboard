@@ -12,22 +12,23 @@ const theme = createTheme({
 });
 
 function App() {
-  const [data, setData] = useState(null);
+  const [merchants, setMerchants] = useState({ data: [] });  // Initialize with empty array
   const [activeRegion, setActiveRegion] = useState('global');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchMerchants = async () => {
       setLoading(true);
       try {
+        console.log('Fetching for region:', activeRegion);
         const response = await fetch(`https://gmc-ecco-backend.onrender.com/api/merchants/${activeRegion}`);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         const result = await response.json();
         console.log('API Response:', result);
-        setData(result);
+        setMerchants(result);
       } catch (err) {
         console.error('Fetch error:', err);
         setError(err.message);
@@ -36,8 +37,13 @@ function App() {
       }
     };
 
-    fetchData();
+    fetchMerchants();
   }, [activeRegion]);
+
+  const handleRegionChange = (newRegion) => {
+    console.log('Changing region to:', newRegion);
+    setActiveRegion(newRegion);
+  };
 
   if (loading) {
     return (
@@ -62,9 +68,9 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <Dashboard 
-        data={data}
+        merchants={merchants}
         activeRegion={activeRegion}
-        setActiveRegion={setActiveRegion}
+        onRegionChange={handleRegionChange}
       />
     </ThemeProvider>
   );

@@ -41,11 +41,18 @@ const LogoContainer = styled(Box)({
   }
 });
 
-const Dashboard = ({ data, activeRegion, setActiveRegion }) => {
-  console.log('Dashboard props:', { data, activeRegion });
-  
-  const regionKey = `ECCO ${activeRegion?.toUpperCase()}`;
-  const merchants = data?.[regionKey]?.data || [];
+const Dashboard = ({ merchants, activeRegion, onRegionChange }) => {
+  console.log('Dashboard props:', { merchants, activeRegion });
+
+  const handleGlobalClick = () => {
+    console.log('Clicking Global');
+    onRegionChange('global');
+  };
+
+  const handleEuropeClick = () => {
+    console.log('Clicking Europe');
+    onRegionChange('europe');
+  };
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -68,40 +75,52 @@ const Dashboard = ({ data, activeRegion, setActiveRegion }) => {
         </Typography>
         
         <Box 
-          onClick={() => setActiveRegion('global')}
+          component="button"
+          onClick={handleGlobalClick}
           sx={{
+            width: '100%',
             p: 2,
+            border: 'none',
             cursor: 'pointer',
             bgcolor: activeRegion === 'global' ? 'rgba(255,255,255,0.1)' : 'transparent',
+            color: 'white',
             borderRadius: 1,
             mb: 1,
+            display: 'flex',
+            alignItems: 'center',
             '&:hover': {
               bgcolor: 'rgba(255,255,255,0.1)'
             }
           }}
         >
-          <Typography sx={{ color: 'white' }}>🌐 Global</Typography>
+          <Typography>🌐 Global</Typography>
         </Box>
         
         <Box 
-          onClick={() => setActiveRegion('europe')}
+          component="button"
+          onClick={handleEuropeClick}
           sx={{
+            width: '100%',
             p: 2,
+            border: 'none',
             cursor: 'pointer',
             bgcolor: activeRegion === 'europe' ? 'rgba(255,255,255,0.1)' : 'transparent',
+            color: 'white',
             borderRadius: 1,
+            display: 'flex',
+            alignItems: 'center',
             '&:hover': {
               bgcolor: 'rgba(255,255,255,0.1)'
             }
           }}
         >
-          <Typography sx={{ color: 'white' }}>🌍 Europe</Typography>
+          <Typography>🌍 Europe</Typography>
         </Box>
       </SideMenu>
 
       <ContentArea>
         <Typography variant="h5" sx={{ mb: 4 }}>
-          ECCO Shoes - {activeRegion?.toUpperCase() || 'GLOBAL'}
+          ECCO Shoes - {activeRegion.toUpperCase()}
         </Typography>
         
         <Box sx={{ 
@@ -109,7 +128,7 @@ const Dashboard = ({ data, activeRegion, setActiveRegion }) => {
           gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
           gap: 3 
         }}>
-          {merchants.map((merchant, index) => (
+          {merchants?.data?.map((merchant, index) => (
             <MerchantCard key={index} merchant={merchant} />
           ))}
         </Box>
