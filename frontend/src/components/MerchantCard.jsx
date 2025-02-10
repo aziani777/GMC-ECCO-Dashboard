@@ -42,6 +42,14 @@ const StatItem = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2)
 }));
 
+const IssueHeader = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginTop: theme.spacing(3),
+  marginBottom: theme.spacing(2)
+}));
+
 const MerchantCard = ({ merchant }) => {
   const [expanded, setExpanded] = useState(false);
   const issueCount = merchant.itemLevelIssues?.length || 0;
@@ -49,11 +57,11 @@ const MerchantCard = ({ merchant }) => {
   return (
     <StyledCard>
       <CardContent sx={{ p: 3 }}>
-        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+        <Typography variant="h5" sx={{ color: '#1976d2', fontWeight: 'bold', mb: 2 }}>
           {merchant.name}
         </Typography>
         
-        <Typography sx={{ color: '#546e7a', mb: 2 }}>
+        <Typography sx={{ color: '#546e7a', mb: 1 }}>
           ID: {merchant.country}
         </Typography>
         
@@ -66,8 +74,6 @@ const MerchantCard = ({ merchant }) => {
         >
           Status: {merchant.status}
         </Typography>
-
-        <Divider sx={{ my: 3 }} />
 
         <StatContainer>
           <StatItem>
@@ -88,37 +94,35 @@ const MerchantCard = ({ merchant }) => {
           </StatItem>
         </StatContainer>
 
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+        <IssueHeader>
+          <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+            Item Level Issues: {issueCount}
+          </Typography>
           <IconButton
             onClick={() => setExpanded(!expanded)}
             sx={{ transform: expanded ? 'rotate(180deg)' : 'none' }}
           >
             <ExpandMoreIcon />
           </IconButton>
-        </Box>
+        </IssueHeader>
 
         <Collapse in={expanded} timeout="auto" unmountOnExit>
-          <Box sx={{ mt: 3 }}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
-              Item Level Issues: {issueCount}
-            </Typography>
-            <List>
-              {merchant.itemLevelIssues?.map((issue, index) => (
-                <ListItem key={index} sx={{ flexDirection: 'column', alignItems: 'flex-start', mb: 2 }}>
-                  <ListItemText
-                    primary={issue.description}
-                    secondary={`Affected items: ${issue.numItems}`}
-                    primaryTypographyProps={{ 
-                      sx: { color: '#1976d2', fontWeight: 'medium', mb: 1 }
-                    }}
-                  />
-                  <Typography variant="body2" color="text.secondary">
-                    {issue.detail}
-                  </Typography>
-                </ListItem>
-              ))} 
-            </List>
-          </Box>
+          <List>
+            {merchant.itemLevelIssues?.map((issue, index) => (
+              <ListItem key={index} sx={{ flexDirection: 'column', alignItems: 'flex-start', mb: 2 }}>
+                <ListItemText
+                  primary={issue.description}
+                  secondary={`Affected items: ${issue.numItems}`}
+                  primaryTypographyProps={{ 
+                    sx: { color: '#1976d2', fontWeight: 'medium', mb: 1 }
+                  }}
+                />
+                <Typography variant="body2" color="text.secondary">
+                  {issue.detail}
+                </Typography>
+              </ListItem>
+            ))} 
+          </List>
         </Collapse>
       </CardContent>
     </StyledCard>

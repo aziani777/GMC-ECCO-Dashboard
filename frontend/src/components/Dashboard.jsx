@@ -64,14 +64,14 @@ const MenuButton = styled(Box)(({ theme, active }) => ({
   alignItems: 'center'
 }));
 
-const Dashboard = ({ activeRegion = 'global', onRegionChange }) => {
+const Dashboard = () => {
   const [merchantData, setMerchantData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedRegion, setSelectedRegion] = useState(activeRegion);
+  const [selectedRegion, setSelectedRegion] = useState('global');
   const [lastUpdate, setLastUpdate] = useState(null);
 
   const fetchData = async (region, force = false) => {
-    // Check cache first
+    // Check if we already have data for this region
     const cachedData = localStorage.getItem(`merchantData_${region}`);
     const cacheTimestamp = localStorage.getItem(`merchantDataTimestamp_${region}`);
     const now = new Date().getTime();
@@ -81,32 +81,40 @@ const Dashboard = ({ activeRegion = 'global', onRegionChange }) => {
       const cacheAge = now - parseInt(cacheTimestamp);
       const cacheExpiry = new Date().setHours(3, 0, 0, 0); // 3 AM CET
       
-      if (cacheAge < 24 * 60 * 60 * 1000 && now < cacheExpiry) { // Cache valid for 24h or until 3 AM
+      if (cacheAge < 24 * 60 * 60 * 1000 && now < cacheExpiry) {
         setMerchantData(JSON.parse(cachedData));
         setLastUpdate(new Date(parseInt(cacheTimestamp)));
         return;
       }
     }
 
-    setIsLoading(true);
-    try {
-      const merchants = await updateMerchantDisplay(region);
-      setMerchantData(merchants);
-      
-      // Update cache
-      localStorage.setItem(`merchantData_${region}`, JSON.stringify(merchants));
-      localStorage.setItem(`merchantDataTimestamp_${region}`, now.toString());
-      setLastUpdate(new Date(now));
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setIsLoading(false);
+    // Only fetch if forced or no cache
+    if (force || !cachedData) {
+      setIsLoading(true);
+      try {
+        const merchants = await updateMerchantDisplay(region);
+        setMerchantData(merchants);
+        
+        // Update cache
+        localStorage.setItem(`merchantData_${region}`, JSON.stringify(merchants));
+        localStorage.setItem(`merchantDataTimestamp_${region}`, now.toString());
+        setLastUpdate(new Date(now));
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
+  const handleRegionChange = (region) => {
+    setSelectedRegion(region);
+    fetchData(region, false); // Don't force refresh on region change
+  };
+
   useEffect(() => {
-    fetchData(selectedRegion);
-  }, [selectedRegion]);
+    fetchData(selectedRegion, false);
+  }, []);
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -131,8 +139,7 @@ const Dashboard = ({ activeRegion = 'global', onRegionChange }) => {
         <Button
           fullWidth
           variant="text"
-          onClick={() => fetchData('global')}
-          disabled={isLoading}
+          onClick={() => handleRegionChange('global')}
           sx={{
             justifyContent: 'flex-start',
             color: 'white',
@@ -148,8 +155,7 @@ const Dashboard = ({ activeRegion = 'global', onRegionChange }) => {
         <Button
           fullWidth
           variant="text"
-          onClick={() => fetchData('europe')}
-          disabled={isLoading}
+          onClick={() => handleRegionChange('europe')}
           sx={{
             justifyContent: 'flex-start',
             color: 'white',
@@ -159,7 +165,7 @@ const Dashboard = ({ activeRegion = 'global', onRegionChange }) => {
             }
           }}
         >
-          🌍 Europe
+          🌍 EUROPE
         </Button>
         
         <Box sx={{ mt: 'auto', p: 2, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
@@ -177,7 +183,6 @@ const Dashboard = ({ activeRegion = 'global', onRegionChange }) => {
           <IconButton 
             onClick={() => fetchData(selectedRegion, true)}
             disabled={isLoading}
-            sx={{ ml: 2 }}
           >
             <RefreshIcon />
           </IconButton>
