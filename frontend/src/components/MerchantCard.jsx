@@ -13,13 +13,14 @@ import {
 } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { styled } from '@mui/material/styles';
 
 const StyledCard = styled(Card)(({ theme }) => ({
   height: '100%',
   display: 'flex',
   flexDirection: 'column',
-  backgroundColor: theme.palette.background.paper,
+  backgroundColor: '#f0f8ff', // Light blue background
   '&:hover': {
     boxShadow: theme.shadows[4],
     transform: 'translateY(-2px)',
@@ -36,8 +37,20 @@ const StatBox = styled(Box)(({ theme }) => ({
   marginTop: theme.spacing(1)
 }));
 
+const ExpandMore = styled((props) => {
+  const { expand, ...other } = props;
+  return <IconButton {...other} />;
+})(({ theme, expand }) => ({
+  transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
+  marginLeft: 'auto',
+  transition: theme.transitions.create('transform', {
+    duration: theme.transitions.duration.shortest,
+  }),
+}));
+
 const MerchantCard = ({ merchant }) => {
   const [showIssues, setShowIssues] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   
   // Get Shopping destination statistics
   const shoppingStats = merchant?.data?.products?.find(
@@ -48,6 +61,10 @@ const MerchantCard = ({ merchant }) => {
   const itemIssues = merchant?.data?.products?.find(
     p => p.destination === 'Shopping'
   )?.itemLevelIssues || [];
+
+  const handleExpandClick = () => {
+    setExpanded(!expanded);
+  };
 
   return (
     <StyledCard>
@@ -145,6 +162,35 @@ const MerchantCard = ({ merchant }) => {
             </Collapse>
           </>
         )}
+
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+          <ExpandMore
+            expand={expanded}
+            onClick={handleExpandClick}
+            aria-expanded={expanded}
+            aria-label="show more"
+          >
+            <ExpandMoreIcon />
+          </ExpandMore>
+        </Box>
+
+        <Collapse in={expanded} timeout="auto" unmountOnExit>
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="subtitle1" gutterBottom>
+              Item Level Issues:
+            </Typography>
+            <List dense>
+              {itemIssues.map((issue, index) => (
+                <ListItem key={index}>
+                  <ListItemText
+                    primary={issue.description}
+                    secondary={`Affected items: ${issue.numItems}`}
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </Box>
+        </Collapse>
       </CardContent>
     </StyledCard>
   );

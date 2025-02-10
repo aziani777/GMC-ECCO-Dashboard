@@ -37,13 +37,20 @@ const extractMerchantStats = (merchantData) => {
 // Function to create merchant card data
 export const createMerchantCard = (merchant) => {
   const stats = extractMerchantStats(merchant);
+  
+  // Get item level issues from Shopping destination
+  const shoppingProduct = merchant.data?.products?.find(
+    product => product.destination === 'Shopping'
+  );
+  
   return {
     name: merchant.name || 'Unknown Merchant',
     country: merchant.data?.accountId || 'Unknown ID',
     status: merchant.data?.websiteClaimed ? 'Active' : 'Inactive',
     active: stats?.active || 0,
     disapproved: stats?.disapproved || 0,
-    total: stats?.total || 0
+    total: stats?.total || 0,
+    itemLevelIssues: shoppingProduct?.itemLevelIssues || []
   };
 };
 

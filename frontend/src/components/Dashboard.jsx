@@ -61,23 +61,17 @@ const MenuButton = styled(Box)(({ theme, active }) => ({
 
 const Dashboard = ({ activeRegion = 'global', onRegionChange }) => {
   const [merchantData, setMerchantData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);  // Add loading state
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedRegion, setSelectedRegion] = useState(activeRegion);
 
   const handleClick = async (region) => {
-    console.log('Clicking region:', region);
-    if (typeof onRegionChange === 'function') {
-      onRegionChange(region);
-    }
-    
-    // Set loading state
+    setSelectedRegion(region);
     setIsLoading(true);
     try {
-      // Fetch and update merchant data
       const merchants = await updateMerchantDisplay(region);
-      console.log('Fetched merchants:', merchants);  // Debug log
       setMerchantData(merchants || []);
     } catch (error) {
-      console.error('Error fetching merchants:', error);
+      console.error('Error:', error);
       setMerchantData([]);
     } finally {
       setIsLoading(false);
@@ -113,29 +107,28 @@ const Dashboard = ({ activeRegion = 'global', onRegionChange }) => {
           fullWidth
           variant="text"
           onClick={() => handleClick('global')}
-          disabled={isLoading}  // Disable while loading
+          disabled={isLoading}
           sx={{
             justifyContent: 'flex-start',
             color: 'white',
-            backgroundColor: activeRegion === 'global' ? 'rgba(255,255,255,0.1)' : 'transparent',
+            backgroundColor: selectedRegion === 'global' ? 'rgba(255,255,255,0.1)' : 'transparent',
             '&:hover': {
               backgroundColor: 'rgba(255,255,255,0.2)'
-            },
-            mb: 1
+            }
           }}
         >
-          🌐 Global
+          🌐 GLOBAL
         </Button>
         
         <Button
           fullWidth
           variant="text"
           onClick={() => handleClick('europe')}
-          disabled={isLoading}  // Disable while loading
+          disabled={isLoading}
           sx={{
             justifyContent: 'flex-start',
             color: 'white',
-            backgroundColor: activeRegion === 'europe' ? 'rgba(255,255,255,0.1)' : 'transparent',
+            backgroundColor: selectedRegion === 'europe' ? 'rgba(255,255,255,0.1)' : 'transparent',
             '&:hover': {
               backgroundColor: 'rgba(255,255,255,0.2)'
             }
@@ -147,28 +140,25 @@ const Dashboard = ({ activeRegion = 'global', onRegionChange }) => {
 
       <ContentArea>
         <Typography variant="h5" sx={{ mb: 4 }}>
-          ECCO Shoes - {activeRegion?.toUpperCase() || 'GLOBAL'}
+          Google Merchant Center Status - {selectedRegion.charAt(0).toUpperCase() + selectedRegion.slice(1)}
         </Typography>
         
         {isLoading ? (
-          <Box sx={{ 
-            display: 'flex', 
-            flexDirection: 'column',
-            alignItems: 'center', 
-            justifyContent: 'center',
-            minHeight: '200px'
-          }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '200px' }}>
             <CircularProgress sx={{ mb: 2 }} />
             <Typography>Loading data. Please wait...</Typography>
           </Box>
         ) : merchantData.length > 0 ? (
           <Box sx={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-            gap: 3 
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 3,
+            justifyContent: 'flex-start'
           }}>
             {merchantData.map((merchant, index) => (
-              <MerchantCard key={index} merchant={merchant} />
+              <Box key={index} sx={{ width: 'calc(33.33% - 16px)' }}>
+                <MerchantCard merchant={merchant} />
+              </Box>
             ))}
           </Box>
         ) : (
