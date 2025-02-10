@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
+import { API_BASE_URL } from './config';  // Import from config
 import './App.css';
-
-// Use environment variable
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
 
 function App() {
   const [selectedRegion, setSelectedRegion] = useState('global');
@@ -19,7 +17,7 @@ function App() {
 
   const checkServerStatus = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/health`);
+      const response = await fetch(`${API_BASE_URL}/health`);
       if (response.ok) {
         setIsServerAwake(true);
         return true;
