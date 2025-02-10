@@ -28,9 +28,9 @@ const StyledCard = styled(Card)(({ theme }) => ({
 
 const StatContainer = styled(Box)(({ theme }) => ({
   display: 'grid',
-  gridTemplateColumns: 'repeat(3, 1fr)',
-  gap: theme.spacing(2),
-  padding: theme.spacing(2, 0),
+  gridTemplateColumns: 'repeat(2, 1fr)',
+  gap: theme.spacing(4),
+  padding: theme.spacing(4, 2),
   marginTop: theme.spacing(2)
 }));
 
@@ -38,7 +38,7 @@ const StatItem = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  padding: theme.spacing(1)
+  padding: theme.spacing(2)
 }));
 
 const MerchantCard = ({ merchant }) => {
@@ -46,12 +46,12 @@ const MerchantCard = ({ merchant }) => {
 
   return (
     <StyledCard>
-      <CardContent sx={{ p: 3 }}>
+      <CardContent sx={{ p: 4 }}>
         <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: '#1976d2' }}>
           {merchant.name}
         </Typography>
         
-        <Typography sx={{ color: '#546e7a', mb: 1 }}>
+        <Typography sx={{ color: '#546e7a', mb: 2 }}>
           ID: {merchant.country}
         </Typography>
         
@@ -59,42 +59,34 @@ const MerchantCard = ({ merchant }) => {
           sx={{ 
             color: merchant.status === 'Active' ? '#2e7d32' : '#d32f2f',
             fontWeight: 'bold',
-            mb: 2
+            mb: 3
           }}
         >
           Status: {merchant.status}
         </Typography>
 
-        <Divider sx={{ my: 2 }} />
+        <Divider sx={{ my: 3 }} />
 
         <StatContainer>
           <StatItem>
-            <Typography variant="h4" sx={{ color: '#2e7d32', fontWeight: 'bold' }}>
+            <Typography variant="h3" sx={{ color: '#2e7d32', fontWeight: 'bold' }}>
               {merchant.active}
             </Typography>
-            <Typography variant="body2" sx={{ color: '#546e7a' }}>
+            <Typography variant="body1" sx={{ color: '#546e7a', mt: 1 }}>
               Active
             </Typography>
           </StatItem>
           <StatItem>
-            <Typography variant="h4" sx={{ color: '#d32f2f', fontWeight: 'bold' }}>
+            <Typography variant="h3" sx={{ color: '#d32f2f', fontWeight: 'bold' }}>
               {merchant.disapproved}
             </Typography>
-            <Typography variant="body2" sx={{ color: '#546e7a' }}>
+            <Typography variant="body1" sx={{ color: '#546e7a', mt: 1 }}>
               Disapproved
-            </Typography>
-          </StatItem>
-          <StatItem>
-            <Typography variant="h4" sx={{ color: '#1976d2', fontWeight: 'bold' }}>
-              {merchant.total}
-            </Typography>
-            <Typography variant="body2" sx={{ color: '#546e7a' }}>
-              Total
             </Typography>
           </StatItem>
         </StatContainer>
 
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
           <IconButton
             onClick={() => setExpanded(!expanded)}
             sx={{ transform: expanded ? 'rotate(180deg)' : 'none' }}
@@ -104,20 +96,23 @@ const MerchantCard = ({ merchant }) => {
         </Box>
 
         <Collapse in={expanded} timeout="auto" unmountOnExit>
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
+          <Box sx={{ mt: 3 }}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
               Item Level Issues:
             </Typography>
-            <List dense sx={{ bgcolor: 'rgba(255,255,255,0.5)', borderRadius: 1 }}>
+            <List>
               {merchant.itemLevelIssues?.map((issue, index) => (
-                <ListItem key={index}>
+                <ListItem key={index} sx={{ flexDirection: 'column', alignItems: 'flex-start', mb: 2 }}>
                   <ListItemText
                     primary={issue.description}
                     secondary={`Affected items: ${issue.numItems}`}
                     primaryTypographyProps={{ 
-                      sx: { color: '#1976d2', fontWeight: 'medium' }
+                      sx: { color: '#1976d2', fontWeight: 'medium', mb: 1 }
                     }}
                   />
+                  <Typography variant="body2" color="text.secondary">
+                    {issue.detail}
+                  </Typography>
                 </ListItem>
               ))} 
             </List>

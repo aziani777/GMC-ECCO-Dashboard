@@ -29,9 +29,9 @@ const MenuItem = styled(Box)(({ active }) => ({
 
 const ContentArea = styled('main')(({ theme }) => ({
   flexGrow: 1,
-  padding: theme.spacing(3),
+  padding: theme.spacing(4),
   marginLeft: 240,
-  backgroundColor: '#f5f8fa',  // Light gray-blue background
+  backgroundColor: '#f5f8fa',
   minHeight: '100vh'
 }));
 
@@ -154,9 +154,10 @@ const Dashboard = ({ activeRegion = 'global', onRegionChange }) => {
         ) : merchantData.length > 0 ? (
           <Box sx={{ 
             display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: 3,
-            padding: 2
+            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+            gap: 4,
+            padding: 2,
+            width: '100%'
           }}>
             {merchantData.map((merchant, index) => (
               <MerchantCard key={index} merchant={merchant} />

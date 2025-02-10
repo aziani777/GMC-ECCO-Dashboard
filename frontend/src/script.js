@@ -26,20 +26,18 @@ const extractMerchantStats = (merchantData) => {
 
   return {
     active: parseInt(shoppingStats.statistics.active) || 0,
-    disapproved: parseInt(shoppingStats.statistics.disapproved) || 0,
-    pending: parseInt(shoppingStats.statistics.pending) || 0,
-    total: parseInt(shoppingStats.statistics.active) + 
-           parseInt(shoppingStats.statistics.disapproved) + 
-           parseInt(shoppingStats.statistics.pending) || 0
+    disapproved: parseInt(shoppingStats.statistics.disapproved) || 0
   };
 };
 
 // Function to create merchant card data
 export const createMerchantCard = (merchant) => {
+  if (!merchant?.data?.products) return null;
+
   const stats = extractMerchantStats(merchant);
   
-  // Get item level issues from Shopping destination
-  const shoppingProduct = merchant.data?.products?.find(
+  // Get Shopping destination data only
+  const shoppingProduct = merchant.data.products.find(
     product => product.destination === 'Shopping'
   );
   
@@ -49,7 +47,6 @@ export const createMerchantCard = (merchant) => {
     status: merchant.data?.websiteClaimed ? 'Active' : 'Inactive',
     active: stats?.active || 0,
     disapproved: stats?.disapproved || 0,
-    total: stats?.total || 0,
     itemLevelIssues: shoppingProduct?.itemLevelIssues || []
   };
 };
