@@ -19,8 +19,10 @@ function App() {
 
   // Memoize the region change handler
   const handleRegionChange = useCallback((region) => {
-    console.log('Changing region to:', region);
+    console.log('App.jsx - handleRegionChange called with:', region);
+    console.log('App.jsx - current activeRegion:', activeRegion);
     setActiveRegion(region);
+    console.log('App.jsx - activeRegion after setState:', region);
   }, []);
 
   useEffect(() => {
