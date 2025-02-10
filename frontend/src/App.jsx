@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ThemeProvider, createTheme, Typography } from '@mui/material/styles';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { Typography, CircularProgress, Box } from '@mui/material';
 import Dashboard from './components/Dashboard';
-import { CircularProgress, Box } from '@mui/material';
 
 const theme = createTheme({
   palette: {

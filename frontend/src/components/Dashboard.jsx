@@ -37,15 +37,13 @@ const LogoContainer = styled(Box)({
   marginBottom: '40px',
   '& img': {
     height: '30px',
-    marginRight: '10px',
-    filter: 'brightness(0) invert(1)' // Makes the logo white
+    marginRight: '10px'
   }
 });
 
 const Dashboard = ({ data, activeRegion, setActiveRegion }) => {
   console.log('Dashboard props:', { data, activeRegion });
   
-  // Get the correct data based on region
   const regionKey = `ECCO ${activeRegion?.toUpperCase()}`;
   const merchants = data?.[regionKey]?.data || [];
 
@@ -70,10 +68,7 @@ const Dashboard = ({ data, activeRegion, setActiveRegion }) => {
         </Typography>
         
         <Box 
-          onClick={() => {
-            console.log('Clicking Global');
-            setActiveRegion('global');
-          }}
+          onClick={() => setActiveRegion('global')}
           sx={{
             p: 2,
             cursor: 'pointer',
@@ -89,10 +84,7 @@ const Dashboard = ({ data, activeRegion, setActiveRegion }) => {
         </Box>
         
         <Box 
-          onClick={() => {
-            console.log('Clicking Europe');
-            setActiveRegion('europe');
-          }}
+          onClick={() => setActiveRegion('europe')}
           sx={{
             p: 2,
             cursor: 'pointer',
