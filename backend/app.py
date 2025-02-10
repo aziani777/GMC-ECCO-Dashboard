@@ -95,44 +95,24 @@ BASE_DIR = Path(__file__).resolve().parent
 SERVICE_ACCOUNT_FILE = BASE_DIR / 'config' / 'service_account.json'
 
 def get_service_account_info():
-    # First try environment variable
+    """Get service account info from environment variable."""
     service_account_json = os.getenv('SERVICE_ACCOUNT_JSON')
-    if service_account_json:
-        return json.loads(service_account_json)
-    
-    # Then try file path
-    file_path = '/etc/secrets/service-account.json'
-    try:
-        with open(file_path) as f:
-            return json.load(f)
-    except:
-        raise Exception("SERVICE_ACCOUNT_JSON environment variable or file is required")
+    if not service_account_json:
+        raise Exception("SERVICE_ACCOUNT_JSON environment variable is required")
+    return json.loads(service_account_json)
 
-# Initialize credentials
-credentials = service_account.Credentials.from_service_account_info(
-    get_service_account_info(),
-    scopes=['https://www.googleapis.com/auth/content']
-)
-
-# Initialize the Google API service
 def initialize_service():
     """Initialize and return the Google Sheets service."""
     try:
-        # Get credentials from environment variable
         credentials_info = get_service_account_info()
         credentials = service_account.Credentials.from_service_account_info(
             credentials_info,
             scopes=['https://www.googleapis.com/auth/spreadsheets.readonly']
         )
-        
-        # Build and return the service
-        service = build('sheets', 'v4', credentials=credentials)
-        return service
+        return build('sheets', 'v4', credentials=credentials)
     except Exception as e:
-        raise Exception(f"Failed to initialize Google Sheets service: {str(e)}")
-
-# Create the service instance
-service = initialize_service()
+        print(f"Error initializing service: {str(e)}")
+        raise
 
 def get_content_api_client():
     """Initialize the Content API client with proper credentials"""
@@ -291,22 +271,30 @@ def fetch_merchant_data(merchant_id, account_id):
 @app.route('/api/merchants/<region>')
 def get_merchants(region):
     try:
-        app.logger.info(f"Fetching {region} merchants data")
-        results = {}
+        service = initialize_service()
+        # Your existing spreadsheet logic here
+        spreadsheet_id = '1FGY9UqPwTvzwrGqtWDAzqEr1G0Rj2RMQO6mLxZwOWrk'
+        range_name = f'{region}!A2:Z'  # Adjust range as needed
         
-        for merchant in get_merchant_accounts(region):
-            try:
-                results[merchant['name']] = fetch_merchant_data(
-                    merchant['account_id'],
-                    merchant['account_id']
-                )
-            except Exception as e:
-                app.logger.error(f"Error fetching {merchant['name']}: {str(e)}")
-                results[merchant['name']] = {'error': str(e)}
+        result = service.spreadsheets().values().get(
+            spreadsheetId=spreadsheet_id,
+            range=range_name
+        ).execute()
         
-        return jsonify(results), 200
+        values = result.get('values', [])
+        if not values:
+            return jsonify({"error": "No data found"}), 404
+            
+        # Process your data here
+        # For now, returning dummy data
+        return jsonify({
+            f"ECCO {region.upper()}": {
+                "name": f"ECCO {region.upper()}",
+                "data": values
+            }
+        })
     except Exception as e:
-        app.logger.error(f"Error getting {region} merchants: {str(e)}")
+        print(f"Error in get_merchants: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 @app.route('/api/merchants/europe')
