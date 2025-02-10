@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, AppBar } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import MerchantCard from './MerchantCard';
 
@@ -14,7 +14,7 @@ const SideMenu = styled(Box)(({ theme }) => ({
   top: 0
 }));
 
-const MenuItem = styled(Typography)(({ active }) => ({
+const MenuItem = styled(Box)(({ active }) => ({
   padding: '12px 16px',
   marginBottom: '8px',
   fontSize: '1.2rem',
@@ -43,6 +43,14 @@ const LogoContainer = styled(Box)({
 });
 
 const Dashboard = ({ merchants, activeRegion, setActiveRegion }) => {
+  const handleGlobalClick = () => {
+    setActiveRegion('global');
+  };
+
+  const handleEuropeClick = () => {
+    setActiveRegion('europe');
+  };
+
   return (
     <Box sx={{ display: 'flex' }}>
       <SideMenu>
@@ -57,16 +65,16 @@ const Dashboard = ({ merchants, activeRegion, setActiveRegion }) => {
         
         <MenuItem 
           active={activeRegion === 'global'} 
-          onClick={() => setActiveRegion('global')}
+          onClick={handleGlobalClick}
         >
-          🌐 Global
+          <Typography>🌐 Global</Typography>
         </MenuItem>
         
         <MenuItem 
           active={activeRegion === 'europe'} 
-          onClick={() => setActiveRegion('europe')}
+          onClick={handleEuropeClick}
         >
-          🌍 Europe
+          <Typography>🌍 Europe</Typography>
         </MenuItem>
       </SideMenu>
 
