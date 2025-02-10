@@ -42,21 +42,12 @@ const LogoContainer = styled(Box)({
   }
 });
 
-const Dashboard = ({ merchants, activeRegion, setActiveRegion }) => {
-  console.log('Dashboard rendered with:', { merchants, activeRegion });
+const Dashboard = ({ data, activeRegion, setActiveRegion }) => {
+  console.log('Dashboard props:', { data, activeRegion });
   
-  // Ensure merchants.data exists and is an array
-  const merchantData = Array.isArray(merchants?.data) ? merchants.data : [];
-
-  const handleGlobalClick = () => {
-    console.log('Global clicked');
-    setActiveRegion('global');
-  };
-
-  const handleEuropeClick = () => {
-    console.log('Europe clicked');
-    setActiveRegion('europe');
-  };
+  // Get the correct data based on region
+  const regionKey = `ECCO ${activeRegion?.toUpperCase()}`;
+  const merchants = data?.[regionKey]?.data || [];
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -71,7 +62,7 @@ const Dashboard = ({ merchants, activeRegion, setActiveRegion }) => {
         </Typography>
         
         <Box 
-          onClick={handleGlobalClick}
+          onClick={() => setActiveRegion('global')}
           sx={{
             p: 2,
             cursor: 'pointer',
@@ -87,7 +78,7 @@ const Dashboard = ({ merchants, activeRegion, setActiveRegion }) => {
         </Box>
         
         <Box 
-          onClick={handleEuropeClick}
+          onClick={() => setActiveRegion('europe')}
           sx={{
             p: 2,
             cursor: 'pointer',
@@ -104,7 +95,7 @@ const Dashboard = ({ merchants, activeRegion, setActiveRegion }) => {
 
       <ContentArea>
         <Typography variant="h5" sx={{ mb: 4 }}>
-          ECCO Shoes - {activeRegion.toUpperCase()}
+          ECCO Shoes - {activeRegion?.toUpperCase() || 'GLOBAL'}
         </Typography>
         
         <Box sx={{ 
@@ -112,7 +103,7 @@ const Dashboard = ({ merchants, activeRegion, setActiveRegion }) => {
           gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
           gap: 3 
         }}>
-          {merchantData.map((merchant, index) => (
+          {merchants.map((merchant, index) => (
             <MerchantCard key={index} merchant={merchant} />
           ))}
         </Box>
