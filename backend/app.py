@@ -282,7 +282,7 @@ def fetch_merchant_data(merchant_id, account_id):
 def get_merchants(region):
     try:
         service = initialize_service()
-        spreadsheet_id = os.getenv('GOOGLE_SHEETS_ID', '1FGY9UqPwTvzwrGqtWDAzqEr1G0Rj2RMQO6mLxZwOWrk')
+        spreadsheet_id = os.getenv('GOOGLE_SHEETS_ID', '1MJhDCmuvP5TADNGZL-NXwolf-gVU_v0cX17Mw3FE7nQ')
         range_name = f'{region}!A2:Z'
         
         # Add debug logging
