@@ -49,17 +49,6 @@ const Dashboard = ({ data, activeRegion, setActiveRegion }) => {
   const regionKey = `ECCO ${activeRegion?.toUpperCase()}`;
   const merchants = data?.[regionKey]?.data || [];
 
-  // Define explicit handler functions with arrow function syntax
-  const handleGlobalClick = () => {
-    console.log('Clicking Global');
-    setActiveRegion('global');
-  };
-
-  const handleEuropeClick = () => {
-    console.log('Clicking Europe');
-    setActiveRegion('europe');
-  };
-
   return (
     <Box sx={{ display: 'flex' }}>
       <SideMenu>
@@ -67,7 +56,7 @@ const Dashboard = ({ data, activeRegion, setActiveRegion }) => {
           <img 
             src="/ecco.png" 
             alt="ECCO" 
-            style={{ filter: 'brightness(0) invert(1)' }} // Makes the logo white
+            style={{ filter: 'brightness(0) invert(1)' }}
           />
           <img 
             src="/gmc.png" 
@@ -81,7 +70,10 @@ const Dashboard = ({ data, activeRegion, setActiveRegion }) => {
         </Typography>
         
         <Box 
-          onClick={handleGlobalClick}
+          onClick={() => {
+            console.log('Clicking Global');
+            setActiveRegion('global');
+          }}
           sx={{
             p: 2,
             cursor: 'pointer',
@@ -97,7 +89,10 @@ const Dashboard = ({ data, activeRegion, setActiveRegion }) => {
         </Box>
         
         <Box 
-          onClick={handleEuropeClick}
+          onClick={() => {
+            console.log('Clicking Europe');
+            setActiveRegion('europe');
+          }}
           sx={{
             p: 2,
             cursor: 'pointer',
