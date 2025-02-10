@@ -45,6 +45,9 @@ const LogoContainer = styled(Box)({
 const Dashboard = ({ merchants, activeRegion, setActiveRegion }) => {
   console.log('Dashboard rendered with:', { merchants, activeRegion });
   
+  // Ensure merchants.data exists and is an array
+  const merchantData = Array.isArray(merchants?.data) ? merchants.data : [];
+
   const handleGlobalClick = () => {
     console.log('Global clicked');
     setActiveRegion('global');
@@ -109,7 +112,7 @@ const Dashboard = ({ merchants, activeRegion, setActiveRegion }) => {
           gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
           gap: 3 
         }}>
-          {merchants?.data?.map((merchant, index) => (
+          {merchantData.map((merchant, index) => (
             <MerchantCard key={index} merchant={merchant} />
           ))}
         </Box>
