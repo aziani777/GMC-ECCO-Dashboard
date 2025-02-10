@@ -20,6 +20,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
   flexDirection: 'column',
   backgroundColor: '#e3f2fd',  // Nice light blue
   transition: 'all 0.3s ease-in-out',
+  paddingBottom: theme.spacing(2),
   '&:hover': {
     boxShadow: '0 8px 16px rgba(0,0,0,0.1)',
     transform: 'translateY(-4px)'
@@ -43,10 +44,11 @@ const StatItem = styled(Box)(({ theme }) => ({
 
 const MerchantCard = ({ merchant }) => {
   const [expanded, setExpanded] = useState(false);
+  const issueCount = merchant.itemLevelIssues?.length || 0;
 
   return (
     <StyledCard>
-      <CardContent sx={{ p: 4 }}>
+      <CardContent sx={{ p: 3 }}>
         <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: '#1976d2' }}>
           {merchant.name}
         </Typography>
@@ -69,7 +71,7 @@ const MerchantCard = ({ merchant }) => {
 
         <StatContainer>
           <StatItem>
-            <Typography variant="h3" sx={{ color: '#2e7d32', fontWeight: 'bold' }}>
+            <Typography variant="h4" sx={{ color: '#2e7d32', fontWeight: 'bold' }}>
               {merchant.active}
             </Typography>
             <Typography variant="body1" sx={{ color: '#546e7a', mt: 1 }}>
@@ -77,7 +79,7 @@ const MerchantCard = ({ merchant }) => {
             </Typography>
           </StatItem>
           <StatItem>
-            <Typography variant="h3" sx={{ color: '#d32f2f', fontWeight: 'bold' }}>
+            <Typography variant="h4" sx={{ color: '#d32f2f', fontWeight: 'bold' }}>
               {merchant.disapproved}
             </Typography>
             <Typography variant="body1" sx={{ color: '#546e7a', mt: 1 }}>
@@ -98,7 +100,7 @@ const MerchantCard = ({ merchant }) => {
         <Collapse in={expanded} timeout="auto" unmountOnExit>
           <Box sx={{ mt: 3 }}>
             <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
-              Item Level Issues:
+              Item Level Issues: {issueCount}
             </Typography>
             <List>
               {merchant.itemLevelIssues?.map((issue, index) => (
