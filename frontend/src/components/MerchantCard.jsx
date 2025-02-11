@@ -47,13 +47,21 @@ const IssueHeader = styled(Box)(({ theme }) => ({
   justifyContent: 'space-between',
   alignItems: 'center',
   marginTop: theme.spacing(3),
-  marginBottom: theme.spacing(2)
+  marginBottom: theme.spacing(2),
+  cursor: 'pointer',
+  '&:hover': {
+    opacity: 0.8
+  }
 }));
 
 const MerchantCard = ({ merchant }) => {
   const [expanded, setExpanded] = useState(false);
   const issueCount = merchant.itemLevelIssues?.length || 0;
   
+  const toggleExpanded = () => {
+    setExpanded(!expanded);
+  };
+
   // Calculate disapproval rate
   const totalProducts = merchant.active + merchant.disapproved;
   const disapprovalRate = totalProducts > 0 
@@ -111,13 +119,21 @@ const MerchantCard = ({ merchant }) => {
           Disapproval Rate: {disapprovalRate}%
         </Typography>
 
-        <IssueHeader>
-          <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+        <IssueHeader onClick={toggleExpanded}>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              fontWeight: 'bold',
+              cursor: 'pointer'
+            }}
+          >
             Item Level Issues: {issueCount}
           </Typography>
           <IconButton
-            onClick={() => setExpanded(!expanded)}
-            sx={{ transform: expanded ? 'rotate(180deg)' : 'none' }}
+            sx={{ 
+              transform: expanded ? 'rotate(180deg)' : 'none',
+              transition: 'transform 0.3s'
+            }}
           >
             <ExpandMoreIcon />
           </IconButton>
