@@ -53,6 +53,12 @@ const IssueHeader = styled(Box)(({ theme }) => ({
 const MerchantCard = ({ merchant }) => {
   const [expanded, setExpanded] = useState(false);
   const issueCount = merchant.itemLevelIssues?.length || 0;
+  
+  // Calculate disapproval rate
+  const totalProducts = merchant.active + merchant.disapproved;
+  const disapprovalRate = totalProducts > 0 
+    ? ((merchant.disapproved / totalProducts) * 100).toFixed(2) 
+    : '0.00';
 
   return (
     <StyledCard>
@@ -93,6 +99,17 @@ const MerchantCard = ({ merchant }) => {
             </Typography>
           </StatItem>
         </StatContainer>
+
+        <Typography 
+          sx={{ 
+            textAlign: 'center', 
+            mt: 2, 
+            color: disapprovalRate > 5 ? '#d32f2f' : '#546e7a',
+            fontWeight: 'medium'
+          }}
+        >
+          Disapproval Rate: {disapprovalRate}%
+        </Typography>
 
         <IssueHeader>
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
