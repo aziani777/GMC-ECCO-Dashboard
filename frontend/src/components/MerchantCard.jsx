@@ -68,6 +68,10 @@ const MerchantCard = ({ merchant }) => {
     ? ((merchant.disapproved / totalProducts) * 100).toFixed(2) 
     : '0.00';
 
+  const getIssueColor = (issue) => {
+    return issue.servability === 'disapproved' ? '#d32f2f' : '#1976d2';
+  };
+
   return (
     <StyledCard>
       <CardContent sx={{ p: 3 }}>
@@ -140,22 +144,28 @@ const MerchantCard = ({ merchant }) => {
         </IssueHeader>
 
         <Collapse in={expanded} timeout="auto" unmountOnExit>
-          <List>
-            {merchant.itemLevelIssues?.map((issue, index) => (
-              <ListItem key={index} sx={{ flexDirection: 'column', alignItems: 'flex-start', mb: 2 }}>
-                <ListItemText
-                  primary={issue.description}
-                  secondary={`Affected items: ${issue.numItems}`}
-                  primaryTypographyProps={{ 
-                    sx: { color: '#1976d2', fontWeight: 'medium', mb: 1 }
-                  }}
-                />
-                <Typography variant="body2" color="text.secondary">
-                  {issue.detail}
-                </Typography>
-              </ListItem>
-            ))} 
-          </List>
+          <Box sx={{ mt: 3 }}>
+            <List>
+              {merchant.itemLevelIssues?.map((issue, index) => (
+                <ListItem key={index} sx={{ flexDirection: 'column', alignItems: 'flex-start', mb: 2 }}>
+                  <ListItemText
+                    primary={issue.description}
+                    secondary={`Affected items: ${issue.numItems}`}
+                    primaryTypographyProps={{ 
+                      sx: { 
+                        color: getIssueColor(issue),
+                        fontWeight: 'medium', 
+                        mb: 1 
+                      }
+                    }}
+                  />
+                  <Typography variant="body2" color="text.secondary">
+                    {issue.detail}
+                  </Typography>
+                </ListItem>
+              ))} 
+            </List>
+          </Box>
         </Collapse>
       </CardContent>
     </StyledCard>
